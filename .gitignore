@@ -42,3 +42,6 @@
 
 # Alarm history files
 **/.alarms_*
+
+#MQTT Managed Tag Providers
+**/ignition/tag-definition/
