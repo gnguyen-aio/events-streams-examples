@@ -8,6 +8,16 @@ TLDR:
 
 All database tables, kafka topics, etc. should prepopulate upon startup.
 
+## 🔗 Connection Details
+
+| Service | Access URL / Port | Credentials (Default) |
+| :--- | :--- | :--- |
+| **Ignition** | `http://localhost:8088` | admin / password |
+| **pgAdmin** | `http://localhost:5050` | pgadmin4@pgadmin.org / admin |
+| **Kafka UI** | `http://localhost:8080` | N/A |
+| **Postgres** | `localhost:5432` | admin / password (DB: postgres) |
+| **Kafka Broker** | `kafka:9092` | Internal Docker Network |
+
 ## 🏗 Architecture Overview
 
 * **Ignition**: Industrial automation platform.
@@ -58,16 +68,6 @@ This repo uses a targeted `.gitignore` to ensure only configuration and source c
 The Postgres container automatically runs `/postgres-init/init.sql` on the first startup to create:
 * `ex_event_streams_example_data`: Process and inventory logs.
 * `ex_event_streams_tag_data`: Tag path, quality, and value history.
-
-## 🔗 Connection Details
-
-| Service | Access URL / Port | Credentials (Default) |
-| :--- | :--- | :--- |
-| **Ignition** | `http://localhost:8088` | admin / password |
-| **pgAdmin** | `http://localhost:5050` | pgadmin4@pgadmin.org / admin |
-| **Kafka UI** | `http://localhost:8080` | N/A |
-| **Postgres** | `localhost:5432` | admin / password (DB: postgres) |
-| **Kafka Broker** | `kafka:9092` | Internal Docker Network |
 
 ## 🛠 Maintenance
 
