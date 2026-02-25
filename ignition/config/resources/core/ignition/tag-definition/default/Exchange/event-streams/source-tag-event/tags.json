@@ -1,0 +1,9 @@
+[
+  {
+    "valueSource": "memory",
+    "dataType": "Boolean",
+    "name": "trigger",
+    "defaultValue": false,
+    "tagType": "AtomicTag"
+  }
+]

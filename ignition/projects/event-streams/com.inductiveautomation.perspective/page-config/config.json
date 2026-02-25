@@ -1,0 +1,14 @@
+{
+  "pages": {
+    "/": {
+      "viewPath": "Exchange/event-streams/Main"
+    },
+    "/simulation": {
+      "title": "Simulation",
+      "viewPath": "Exchange/event-streams/Simulation"
+    }
+  },
+  "sharedDocks": {
+    "cornerPriority": "top-bottom"
+  }
+}

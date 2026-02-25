@@ -1,0 +1,44 @@
+# ==========================================================
+# Docker Environment Git Ignore
+# ==========================================================
+
+# Secrets and sensitive files
+.env
+
+# Database & Tag Provider Runtime Files
+**/valueStore.idb
+**/db/
+**/metricsdb/
+**/autobackup/
+**/db_backup_sqlite.idb
+
+# Cache and temporary files
+**/jar-cache/
+**/request
+**/response
+*.tmp
+*.bak
+**/var
+
+# Log files
+*.log
+**/logs/
+
+# Certificates and security (Keep these private!)
+**/certificates/
+**/keystore/
+
+# Runtime & Local Configuration
+**/config/local/
+**/config/resources/local/
+**/.container-init.conf
+
+# Backup and converted files
+**/conversion-report.txt
+**.digest.json
+**/projects/conversion-report.txt
+**/migration-log-*.md
+**/.resources/
+
+# Alarm history files
+**/.alarms_*

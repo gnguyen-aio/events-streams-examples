@@ -1,0 +1,437 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {},
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "LabelTitle"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/event-streams/title"
+              },
+              "text": "Event Streams Resource"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "LabelSubtitle"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/event-streams/subtitle"
+              },
+              "text": "Welcome to the Event Stream Exchange Resource, this resource will give you an example of how to use each Source and Handler. Each \"source-xxxx-xxxx\" event stream resource will log a message to the gateway logs. The \"handler-all\" will stream a tag event change to all handler types."
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainerHeader"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/event-streams/title"
+              },
+              "text": "handler-all"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "ToggleSwitch"
+            },
+            "position": {
+              "basis": "36px"
+            },
+            "propConfig": {
+              "props.selected": {
+                "binding": {
+                  "config": {
+                    "bidirectional": true,
+                    "fallbackDelay": 2.5,
+                    "mode": "direct",
+                    "tagPath": "[default]Exchange/event-streams/handler-all"
+                  },
+                  "type": "tag"
+                }
+              }
+            },
+            "props": {
+              "label": {
+                "text": "Toggle to Initiate(make sure read/write gateway communications are allowed for the Designer)"
+              },
+              "style": {
+                "classes": "exchange/event-streams/subtitle"
+              }
+            },
+            "type": "ia.input.toggle-switch"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainerHandlerAll"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "classes": "exchange/event-streams/container"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/event-streams/title"
+              },
+              "text": "source-event-listener"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "events": {
+                  "dom": {
+                    "onClick": {
+                      "config": {
+                        "script": "\tproject \u003d \"event-streams\"\n\tpath \u003d \"exchange/event-streams/source-event-listener\"\n\tacknowledge \u003d True\n\t\n\tmessage \u003d self.getSibling(\"TextField\").props.text\n\t#https://docs.inductiveautomation.com/docs/8.3/appendix/scripting-functions/system-eventstream/system-eventstream-publishEvent\n\tsystem.eventstream.publishEvent(project, path, message, acknowledge)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Button"
+                },
+                "position": {
+                  "basis": "200px",
+                  "shrink": 0
+                },
+                "props": {
+                  "text": "Event Stream Publish"
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "meta": {
+                  "name": "TextField"
+                },
+                "position": {
+                  "basis": "362px"
+                },
+                "props": {
+                  "style": {
+                    "marginLeft": "10px"
+                  },
+                  "text": "example payload to publish"
+                },
+                "type": "ia.input.text-field"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "50px"
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainerSourceEventListener"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "classes": "exchange/event-streams/container"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/event-streams/title"
+              },
+              "text": "source-http"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "events": {
+                  "dom": {
+                    "onClick": {
+                      "config": {
+                        "script": "\tclient \u003d system.net.httpClient()\n\turl \u003d \u0027http://localhost:8088/system/eventstream/event-streams/exchange/event-streams/source-http\u0027\n\tdata \u003d {\u0027hello\u0027: \u0027world\u0027}\n\tclient.post(url,data \u003d data)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Button"
+                },
+                "position": {
+                  "basis": "200px",
+                  "shrink": 0
+                },
+                "props": {
+                  "text": "httpPost Example"
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "classes": "exchange/event-streams/subtitle",
+                    "paddingLeft": "10px"
+                  },
+                  "text": "Posting to: http://localhost:8088/system/eventstream/event-streams/exchange/event-streams/source-http"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "49px"
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainerSourceHTTP"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "classes": "exchange/event-streams/container"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/event-streams/title"
+              },
+              "text": "source-mqtt"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "events": {
+                  "dom": {
+                    "onClick": {
+                      "config": {
+                        "script": "\t#https://docs.chariot.io/display/CLD83/MQTT+Publishing+via+MQTT+Transmission\n\t#https://docs.chariot.io/display/CLD83/MQTT+Engine+Event+Streams#:~:text\u003dSetting%20up%20MQTT%20Event%20Stream%20Source\n\t\n\tmqttServerName \u003d \u0027Chariot SCADA\u0027 #The server name as shown in the MQTT Transmission Settings configuration shown below\n\ttopic \u003d \u0027EventStreams\u0027 #The MQTT Topic to publish on, this needs to be the same name that is defined in the source-mqtt event stream\n\tpayload \u003d system.util.jsonEncode([{\u0027message\u0027: \u0027hello world\u0027}])\n\tqos \u003d 0\n\tretained \u003d False\n\tsystem.cirruslink.transmission.publish(mqttServerName, topic, payload, qos, retained)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Button"
+                },
+                "position": {
+                  "basis": "200px",
+                  "shrink": 0
+                },
+                "props": {
+                  "text": "Publish MQTT Example"
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "classes": "exchange/event-streams/subtitle",
+                    "paddingLeft": "10px"
+                  },
+                  "text": "Publishing to Chariot SCADA broker connection on EventStreams topic. See onClick event script"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "49px"
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainerSourceMQTT"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "classes": "exchange/event-streams/container"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/event-streams/title"
+              },
+              "text": "source-sparkplug"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "ToggleSwitch"
+            },
+            "position": {
+              "basis": "36px"
+            },
+            "propConfig": {
+              "props.selected": {
+                "binding": {
+                  "config": {
+                    "bidirectional": true,
+                    "fallbackDelay": 2.5,
+                    "mode": "direct",
+                    "tagPath": "[default]MQTT Tags/source-sparkplug"
+                  },
+                  "type": "tag"
+                }
+              }
+            },
+            "props": {
+              "label": {
+                "text": "Toggle to Initiate(make sure read/write gateway communications are allowed for the Designer)"
+              },
+              "style": {
+                "classes": "exchange/event-streams/subtitle"
+              }
+            },
+            "type": "ia.input.toggle-switch"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainerSourceMQTT_0"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "classes": "exchange/event-streams/container"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "padding": "10px"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

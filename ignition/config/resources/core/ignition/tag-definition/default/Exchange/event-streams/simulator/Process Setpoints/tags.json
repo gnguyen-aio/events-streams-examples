@@ -1,0 +1,32 @@
+[
+  {
+    "valueSource": "memory",
+    "dataType": "Float8",
+    "name": "Rice Conveyor",
+    "defaultValue": 0.0,
+    "engUnit": "RPM",
+    "tagType": "AtomicTag"
+  },
+  {
+    "valueSource": "memory",
+    "dataType": "Float8",
+    "name": "Mixer Motor",
+    "defaultValue": 0.0,
+    "tagType": "AtomicTag"
+  },
+  {
+    "valueSource": "memory",
+    "dataType": "Float8",
+    "name": "Exit Valve",
+    "defaultValue": 0.0,
+    "tagType": "AtomicTag"
+  },
+  {
+    "valueSource": "memory",
+    "dataType": "Float8",
+    "name": "Beans Conveyor",
+    "defaultValue": 0.0,
+    "engUnit": "RPM",
+    "tagType": "AtomicTag"
+  }
+]

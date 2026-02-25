@@ -1,0 +1,16 @@
+[
+  {
+    "valueSource": "memory",
+    "dataType": "DateTime",
+    "name": "tag-handler",
+    "formatString": "yyyy-MM-dd h:mm:ss aa",
+    "tagType": "AtomicTag"
+  },
+  {
+    "valueSource": "memory",
+    "dataType": "Boolean",
+    "name": "trigger",
+    "defaultValue": true,
+    "tagType": "AtomicTag"
+  }
+]

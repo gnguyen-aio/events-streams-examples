@@ -1,0 +1,29 @@
+[
+  {
+    "valueSource": "memory",
+    "opcItemPath": "ns\u003d1;s\u003d[CentralSim]_Meta:Refrigeration/Compressor2/percentLoaded",
+    "dataType": "Float8",
+    "name": "Rice Inventory",
+    "defaultValue": 200.0,
+    "tagType": "AtomicTag",
+    "opcServer": "Ignition OPC UA Server"
+  },
+  {
+    "valueSource": "memory",
+    "opcItemPath": "ns\u003d1;s\u003d[CentralSim]_Meta:Refrigeration/Compressor1/lineVoltage",
+    "dataType": "Float8",
+    "name": "Beans Inventory",
+    "defaultValue": 200.0,
+    "tagType": "AtomicTag",
+    "opcServer": "Ignition OPC UA Server"
+  },
+  {
+    "valueSource": "memory",
+    "opcItemPath": "ns\u003d1;s\u003d[CentralSim]_Meta:Refrigeration/Compressor2/motorAmps",
+    "dataType": "Float8",
+    "name": "Mixer Weight",
+    "defaultValue": 0.0,
+    "tagType": "AtomicTag",
+    "opcServer": "Ignition OPC UA Server"
+  }
+]

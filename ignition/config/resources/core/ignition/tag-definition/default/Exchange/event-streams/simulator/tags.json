@@ -1,0 +1,29 @@
+[
+  {
+    "eventScripts": [
+      {
+        "eventid": "valueChanged",
+        "script": "\texchange.eventStreams.eventStreamsSim()"
+      }
+    ],
+    "valueSource": "expr",
+    "expression": "now(1000)",
+    "dataType": "DateTime",
+    "name": "Simulator",
+    "formatString": "yyyy-MM-dd h:mm:ss aa",
+    "tagType": "AtomicTag"
+  },
+  {
+    "valueSource": "memory",
+    "name": "Process Step",
+    "defaultValue": 0,
+    "tagType": "AtomicTag"
+  },
+  {
+    "valueSource": "memory",
+    "dataType": "Boolean",
+    "name": "Simulation Active",
+    "defaultValue": true,
+    "tagType": "AtomicTag"
+  }
+]

@@ -1,0 +1,295 @@
+{
+  "enabled": true,
+  "source": {
+    "type": "ignition.tagEvent",
+    "config": {
+      "paths": [
+        "[default]Exchange/event-streams/handler-all/trigger"
+      ],
+      "changeTypes": [
+        "VALUE",
+        "QUALITY",
+        "TIMESTAMP"
+      ],
+      "skipInitialValues": true
+    }
+  },
+  "sourceEncoder": {
+    "type": "ignition.jsonObject",
+    "properties": {
+      "encoding": "UTF-8"
+    }
+  },
+  "handlers": [
+    {
+      "enabled": true,
+      "type": "com.inductiveautomation.sqlbridge.datasource",
+      "config": {
+        "mode": "INSERT",
+        "bypassStoreForward": false,
+        "datasourceName": "postgres",
+        "tableName": "ex_event_streams_tag_data",
+        "autoCreateTable": false,
+        "timestampColumnEnabled": true,
+        "timestampColumnName": "event_stream_ts",
+        "columnMappings": [
+          {
+            "name": "value",
+            "type": "Boolean",
+            "value": {
+              "data": "{event.data.value}",
+              "type": "EXPRESSION"
+            }
+          },
+          {
+            "name": "quality",
+            "type": "String",
+            "value": {
+              "data": "{event.data.quality}",
+              "type": "EXPRESSION"
+            }
+          },
+          {
+            "name": "ts",
+            "type": "DateTime",
+            "value": {
+              "data": "{event.data.timestamp}",
+              "type": "EXPRESSION"
+            }
+          },
+          {
+            "name": "tag_path",
+            "type": "String",
+            "value": {
+              "data": "{event.metadata.tagPath}",
+              "type": "EXPRESSION"
+            }
+          }
+        ],
+        "whereClauses": []
+      },
+      "failureStrategy": {
+        "type": "ABORT",
+        "retryPolicy": null
+      }
+    },
+    {
+      "enabled": true,
+      "type": "ignition.gatewayEvent",
+      "config": {
+        "project": {
+          "data": "event-streams",
+          "type": "STATIC"
+        },
+        "path": {
+          "data": "exchange/event-streams/source-event-listener",
+          "type": "STATIC"
+        },
+        "payload": {
+          "data": "\"Example payload for source-event-listener\"",
+          "type": "EXPRESSION"
+        },
+        "acknowledge": false,
+        "remoteServer": ""
+      },
+      "failureStrategy": {
+        "type": "ABORT",
+        "retryPolicy": null
+      }
+    },
+    {
+      "enabled": true,
+      "type": "ignition.gatewayMessage",
+      "config": {
+        "project": {
+          "data": "event-streams",
+          "type": "STATIC"
+        },
+        "messageHandler": {
+          "data": "\u0027event-stream-message-handler\u0027",
+          "type": "EXPRESSION"
+        },
+        "payload": {
+          "data": "{event.data}",
+          "type": "EXPRESSION"
+        },
+        "properties": []
+      },
+      "failureStrategy": {
+        "type": "ABORT",
+        "retryPolicy": null
+      }
+    },
+    {
+      "enabled": true,
+      "type": "ignition.http",
+      "config": {
+        "type": "POST",
+        "cookiesEnabled": true,
+        "connectionTimeout": 30000,
+        "url": {
+          "data": "\"http://localhost:8088/system/webdev/event-streams/exchange/event-streams/handler-web-dev\"",
+          "type": "EXPRESSION"
+        },
+        "headers": [],
+        "body": {
+          "data": "{event.data}",
+          "type": "EXPRESSION"
+        }
+      },
+      "failureStrategy": {
+        "type": "ABORT",
+        "retryPolicy": null
+      }
+    },
+    {
+      "enabled": true,
+      "type": "ignition.logger",
+      "config": {
+        "name": {
+          "data": "\u0027Logger Handler | handler-all Event Stream\u0027",
+          "type": "EXPRESSION"
+        },
+        "logLevel": "INFO",
+        "message": {
+          "data": "\u0027Data: \u0027+{event.data} + \u0027 || Metadata: \u0027+ {event.metadata}",
+          "type": "EXPRESSION"
+        }
+      },
+      "failureStrategy": {
+        "type": "ABORT",
+        "retryPolicy": null
+      }
+    },
+    {
+      "enabled": true,
+      "type": "ignition.script",
+      "config": {
+        "userCode": "\tsystem.util.getLogger(\"event-stream\").info(str(events[0].data))"
+      },
+      "failureStrategy": {
+        "type": "ABORT",
+        "retryPolicy": null
+      }
+    },
+    {
+      "enabled": true,
+      "type": "ignition.tag",
+      "config": {
+        "tagPath": {
+          "data": "\"[default]Exchange/event-streams/handler-all/tag-handler\"",
+          "type": "EXPRESSION"
+        },
+        "value": {
+          "data": "now(0)",
+          "type": "EXPRESSION"
+        },
+        "quality": {
+          "data": "192",
+          "type": "EXPRESSION"
+        },
+        "timestamp": {
+          "data": "now(0)",
+          "type": "EXPRESSION"
+        }
+      },
+      "failureStrategy": {
+        "type": "ABORT",
+        "retryPolicy": null
+      }
+    },
+    {
+      "enabled": true,
+      "type": "com.cirruslink.mqtt.transmission.gateway.mqtt.handler",
+      "config": {
+        "serverName": "Chariot SCADA",
+        "topic": "EventStreams/mqttStream",
+        "qos": 0,
+        "retained": false
+      },
+      "failureStrategy": {
+        "type": "ABORT",
+        "retryPolicy": null
+      }
+    },
+    {
+      "enabled": true,
+      "type": "com.inductiveautomation.connectors.kafka.eventstream.handler",
+      "config": {
+        "connector": "kafka",
+        "topic": {
+          "data": "\u0027data-to-kafka\u0027",
+          "type": "EXPRESSION"
+        },
+        "key": {
+          "data": "\u0027data\u0027",
+          "type": "EXPRESSION"
+        },
+        "value": {
+          "data": "{event.data}",
+          "type": "EXPRESSION"
+        },
+        "partition": {
+          "data": "",
+          "type": "STATIC"
+        },
+        "timestamp": {
+          "data": "now()",
+          "type": "EXPRESSION"
+        },
+        "headers": [
+          {
+            "key": "tagPath",
+            "value": {
+              "data": "{event.metadata}[\u0027tagPath\u0027]",
+              "type": "EXPRESSION"
+            }
+          }
+        ],
+        "properties": []
+      },
+      "failureStrategy": {
+        "type": "ABORT",
+        "retryPolicy": null
+      }
+    },
+    {
+      "enabled": true,
+      "type": "com.cirruslink.mqtt.transmission.gateway.mqtt.handler",
+      "config": {
+        "serverName": "Chariot SCADA",
+        "topic": "EventStreams/mqttStream",
+        "qos": 0,
+        "retained": false
+      },
+      "failureStrategy": {
+        "type": "ABORT",
+        "retryPolicy": null
+      }
+    }
+  ],
+  "batch": {
+    "debounceMs": 100,
+    "maxWaitMs": 1000,
+    "maxQueueSize": 0,
+    "overflow": "DROP_OLDEST"
+  },
+  "filter": {
+    "enabled": false,
+    "userCode": "\treturn True"
+  },
+  "transform": {
+    "enabled": false,
+    "userCode": "\treturn event.data"
+  },
+  "transformEncoder": {
+    "type": "ignition.jsonObject",
+    "properties": {
+      "encoding": "UTF-8"
+    }
+  },
+  "onError": {
+    "enabled": false,
+    "userCode": ""
+  }
+}

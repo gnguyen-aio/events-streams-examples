@@ -1,0 +1,9 @@
+[
+  {
+    "valueSource": "memory",
+    "dataType": "Boolean",
+    "name": "source-sparkplug",
+    "defaultValue": false,
+    "tagType": "AtomicTag"
+  }
+]

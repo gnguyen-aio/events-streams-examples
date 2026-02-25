@@ -1,0 +1,58 @@
+{
+  "enabled": true,
+  "source": {
+    "type": "ignition.gatewayEvent",
+    "config": null
+  },
+  "sourceEncoder": {
+    "type": "ignition.jsonObject",
+    "properties": {
+      "encoding": "UTF-8"
+    }
+  },
+  "handlers": [
+    {
+      "enabled": true,
+      "type": "ignition.logger",
+      "config": {
+        "name": {
+          "data": "\u0027source-alarm-notification-pipeline Event Stream | Logger Handler\u0027",
+          "type": "EXPRESSION"
+        },
+        "logLevel": "INFO",
+        "message": {
+          "data": "\u0027Data: \u0027+{event.data} + \u0027 || Metadata: \u0027+ toStr({event.metadata})",
+          "type": "EXPRESSION"
+        }
+      },
+      "failureStrategy": {
+        "type": "ABORT",
+        "retryPolicy": null
+      }
+    }
+  ],
+  "batch": {
+    "debounceMs": 100,
+    "maxWaitMs": 1000,
+    "maxQueueSize": 0,
+    "overflow": "DROP_OLDEST"
+  },
+  "filter": {
+    "enabled": false,
+    "userCode": "\treturn True"
+  },
+  "transform": {
+    "enabled": false,
+    "userCode": "\treturn event.data"
+  },
+  "transformEncoder": {
+    "type": "ignition.jsonObject",
+    "properties": {
+      "encoding": "UTF-8"
+    }
+  },
+  "onError": {
+    "enabled": false,
+    "userCode": ""
+  }
+}

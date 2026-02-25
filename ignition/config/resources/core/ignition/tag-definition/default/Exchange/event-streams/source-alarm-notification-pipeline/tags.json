@@ -1,0 +1,16 @@
+[
+  {
+    "valueSource": "memory",
+    "dataType": "Boolean",
+    "alarms": [
+      {
+        "setpointA": 1.0,
+        "activePipeline": "event-streams/event-streams-example",
+        "name": "High Alarm"
+      }
+    ],
+    "name": "toggle",
+    "defaultValue": false,
+    "tagType": "AtomicTag"
+  }
+]

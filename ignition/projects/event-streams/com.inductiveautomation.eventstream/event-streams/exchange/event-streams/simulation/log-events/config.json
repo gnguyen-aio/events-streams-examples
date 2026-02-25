@@ -1,0 +1,118 @@
+{
+  "enabled": true,
+  "source": {
+    "type": "ignition.tagEvent",
+    "config": {
+      "paths": [
+        "[default]Exchange/event-streams/simulator/Process Step"
+      ],
+      "changeTypes": [
+        "VALUE"
+      ],
+      "skipInitialValues": true
+    }
+  },
+  "sourceEncoder": {
+    "type": "ignition.jsonObject",
+    "properties": {
+      "encoding": "UTF-8"
+    }
+  },
+  "handlers": [
+    {
+      "enabled": true,
+      "type": "ignition.logger",
+      "config": {
+        "name": {
+          "data": "\u0027Logger Handler | simulation/log-events Event Stream\u0027",
+          "type": "EXPRESSION"
+        },
+        "logLevel": "INFO",
+        "message": {
+          "data": "\u0027Data: \u0027+{event.data} + \u0027 || Metadata: \u0027+ {event.metadata}",
+          "type": "EXPRESSION"
+        }
+      },
+      "failureStrategy": {
+        "type": "ABORT",
+        "retryPolicy": null
+      }
+    },
+    {
+      "enabled": true,
+      "type": "com.inductiveautomation.sqlbridge.datasource",
+      "config": {
+        "mode": "INSERT",
+        "bypassStoreForward": false,
+        "datasourceName": "postgres",
+        "tableName": "ex_event_streams_example_data",
+        "autoCreateTable": false,
+        "timestampColumnEnabled": true,
+        "timestampColumnName": "event_stream_ts",
+        "columnMappings": [
+          {
+            "name": "beans_inventory",
+            "type": "Int4",
+            "value": {
+              "data": "{event.data.beansInventory}",
+              "type": "EXPRESSION"
+            }
+          },
+          {
+            "name": "rice_inventory",
+            "type": "Int4",
+            "value": {
+              "data": "{event.data.riceInventory}",
+              "type": "EXPRESSION"
+            }
+          },
+          {
+            "name": "mixer_weight",
+            "type": "Int4",
+            "value": {
+              "data": "{event.data.mixerWeight}",
+              "type": "EXPRESSION"
+            }
+          },
+          {
+            "name": "process_step",
+            "type": "Int4",
+            "value": {
+              "data": "{event.data.value}",
+              "type": "EXPRESSION"
+            }
+          }
+        ],
+        "whereClauses": []
+      },
+      "failureStrategy": {
+        "type": "ABORT",
+        "retryPolicy": null
+      }
+    }
+  ],
+  "batch": {
+    "debounceMs": 100,
+    "maxWaitMs": 1000,
+    "maxQueueSize": 0,
+    "overflow": "DROP_OLDEST"
+  },
+  "filter": {
+    "enabled": false,
+    "userCode": "\treturn True"
+  },
+  "transform": {
+    "enabled": true,
+    "userCode": "\ttagPaths \u003d [\n\t\t\u0027[default]Exchange/event-streams/simulator/Process Values/Beans Inventory\u0027,\n\t\t\u0027[default]Exchange/event-streams/simulator/Process Values/Mixer Weight\u0027,\n\t\t\u0027[default]Exchange/event-streams/simulator/Process Values/Rice Inventory\u0027\n\t]\n\tresults \u003d system.tag.readBlocking(tagPaths)\n\tevent.data[\u0027beansInventory\u0027] \u003d results[0].value\n\tevent.data[\u0027mixerWeight\u0027] \u003d results[1].value\n\tevent.data[\u0027riceInventory\u0027] \u003d results[2].value\n\t\n\treturn event.data"
+  },
+  "transformEncoder": {
+    "type": "ignition.jsonObject",
+    "properties": {
+      "encoding": "UTF-8"
+    }
+  },
+  "onError": {
+    "enabled": false,
+    "userCode": ""
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "base": {
+    "style": {
+      "color": "--info",
+      "fontSize": "14px"
+    }
+  }
+}
