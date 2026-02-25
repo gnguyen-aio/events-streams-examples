@@ -43,5 +43,8 @@
 # Alarm history files
 **/.alarms_*
 
-#MQTT Managed Tag Providers
-**/ignition/tag-definition/
+# Ignore all subfolders in tag-definition
+ignition/config/resources/core/ignition/tag-definition/*/
+
+# Explicitly allow (don't ignore) the default tag provider
+!ignition/config/resources/core/ignition/tag-definition/default/

@@ -1,9 +1,0 @@
-[
-  {
-    "usr": {
-      "dataType": "Boolean"
-    },
-    "name": "source-sparkplug",
-    "tagType": "AtomicTag"
-  }
-]
