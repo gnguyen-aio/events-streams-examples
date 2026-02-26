@@ -3,8 +3,9 @@
 This repository contains a containerized development environment featuring examples of the Event Streams module.
 
 TLDR:
-1. git clone <your-repo-url>
-2. docker compose up -d
+1. git clone https://github.com/ia-rtyson/events-streams-examples.git event-streams-test
+2. update .env.example >> .env and change varable there as necessary
+3. docker compose up -d
 
 All database tables, kafka topics, etc. should prepopulate upon startup.
 

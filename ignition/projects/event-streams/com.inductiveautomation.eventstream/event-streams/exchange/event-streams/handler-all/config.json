@@ -165,7 +165,7 @@
       "enabled": true,
       "type": "ignition.script",
       "config": {
-        "userCode": "\tsystem.util.getLogger(\"event-stream\").info(str(events[0].data))"
+        "userCode": "\tsystem.util.getLogger(\"Script Handler || handler-all Event Stream\").info(str(events[0].data))"
       },
       "failureStrategy": {
         "type": "ABORT",

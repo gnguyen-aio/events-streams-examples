@@ -79,7 +79,7 @@
                     "bidirectional": true,
                     "fallbackDelay": 2.5,
                     "mode": "direct",
-                    "tagPath": "[default]Exchange/event-streams/handler-all"
+                    "tagPath": "[default]Exchange/event-streams/handler-all/trigger"
                   },
                   "type": "tag"
                 }
