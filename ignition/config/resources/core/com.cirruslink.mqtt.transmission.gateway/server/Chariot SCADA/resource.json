@@ -4,14 +4,16 @@
   "restricted": false,
   "overridable": true,
   "files": [
-    "config.json"
+    "config.json",
+    "backupConfig.json"
   ],
   "attributes": {
     "lastModification": {
-      "actor": "unknown",
-      "timestamp": "2026-02-06T20:21:14Z"
+      "actor": "admin",
+      "timestamp": "2026-07-13T07:29:43Z"
     },
     "uuid": "42af214c-74a4-4ea5-ba15-54230f0e5a5d",
-    "lastModificationSignature": "3c3400e62e280245bc58ec9f908780b540b8e50d91056a7f3b14172aa6d678fa"
+    "lastModificationSignature": "4979ff5cae573062061e3f75297f9249f0e48b8e94a975942a47aa1afb9b2e69",
+    "enabled": true
   }
 }

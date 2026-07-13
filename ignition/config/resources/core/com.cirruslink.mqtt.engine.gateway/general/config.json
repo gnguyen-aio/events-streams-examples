@@ -1,7 +1,7 @@
 {
   "alarmDisplayPathType": "IDS_AND_EDGE",
-  "blockDeviceCommands": true,
-  "blockNodeCommands": true,
+  "blockDeviceCommands": false,
+  "blockNodeCommands": false,
   "blockTagPropertyChanges": false,
   "customProperties": "{}",
   "enableAlarmEventPublishing": true,

@@ -5,5 +5,11 @@
     "name": "source-sparkplug",
     "defaultValue": false,
     "tagType": "AtomicTag"
+  },
+  {
+    "valueSource": "memory",
+    "documentation": "Pour usage MQTT SpB au lieu de tag",
+    "name": "processSimulatorStep",
+    "tagType": "AtomicTag"
   }
 ]

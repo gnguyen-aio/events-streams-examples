@@ -1,4 +1,5 @@
 {
+  "auditProfile": "Audit Log Local",
   "enableTransmission": true,
   "redundancyTransitionActiveDelay": 3000
 }

@@ -4,17 +4,17 @@
       "$": [
         "ts",
         192,
-        1772143325784
+        1783930288874
       ],
-      "$ts": 1772143325784
+      "$ts": 1783930288874
     },
     "StartDate": {
       "$": [
         "ts",
         192,
-        1772143325784
+        1783930288874
       ],
-      "$ts": 1772139725784
+      "$ts": 1783926688874
     },
     "serialNumber": "value"
   },
@@ -154,7 +154,6 @@
                       "config": {
                         "fallbackDelay": 2.5,
                         "mode": "direct",
-                        "publishInitial": false,
                         "tagPath": "[default]Exchange/event-streams/simulator/Process Step"
                       },
                       "type": "tag"

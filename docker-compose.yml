@@ -9,6 +9,7 @@ services:
     restart: no
     ports:
       - 8088:8088
+      - 1883:1883
     volumes:
       - ignition-data:/usr/local/bin/ignition/data
       # Mount gateway config and projects for version control
