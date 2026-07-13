@@ -1,5 +1,20 @@
 [
   {
+    "valueSource": "memory",
+    "historyProvider": "Historian Splitter",
+    "name": "Process Step",
+    "historyEnabled": true,
+    "defaultValue": 0,
+    "tagType": "AtomicTag"
+  },
+  {
+    "valueSource": "memory",
+    "dataType": "Boolean",
+    "name": "Simulation Active",
+    "defaultValue": true,
+    "tagType": "AtomicTag"
+  },
+  {
     "eventScripts": [
       {
         "eventid": "valueChanged",
@@ -11,19 +26,6 @@
     "dataType": "DateTime",
     "name": "Simulator",
     "formatString": "yyyy-MM-dd h:mm:ss aa",
-    "tagType": "AtomicTag"
-  },
-  {
-    "valueSource": "memory",
-    "name": "Process Step",
-    "defaultValue": 0,
-    "tagType": "AtomicTag"
-  },
-  {
-    "valueSource": "memory",
-    "dataType": "Boolean",
-    "name": "Simulation Active",
-    "defaultValue": true,
     "tagType": "AtomicTag"
   }
 ]

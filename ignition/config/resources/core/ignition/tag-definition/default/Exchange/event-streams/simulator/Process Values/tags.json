@@ -1,18 +1,11 @@
 [
   {
     "valueSource": "memory",
-    "opcItemPath": "ns\u003d1;s\u003d[CentralSim]_Meta:Refrigeration/Compressor2/percentLoaded",
-    "dataType": "Float8",
-    "name": "Rice Inventory",
-    "defaultValue": 200.0,
-    "tagType": "AtomicTag",
-    "opcServer": "Ignition OPC UA Server"
-  },
-  {
-    "valueSource": "memory",
     "opcItemPath": "ns\u003d1;s\u003d[CentralSim]_Meta:Refrigeration/Compressor1/lineVoltage",
     "dataType": "Float8",
+    "historyProvider": "Historian Splitter",
     "name": "Beans Inventory",
+    "historyEnabled": true,
     "defaultValue": 200.0,
     "tagType": "AtomicTag",
     "opcServer": "Ignition OPC UA Server"
@@ -21,8 +14,21 @@
     "valueSource": "memory",
     "opcItemPath": "ns\u003d1;s\u003d[CentralSim]_Meta:Refrigeration/Compressor2/motorAmps",
     "dataType": "Float8",
+    "historyProvider": "Historian Splitter",
     "name": "Mixer Weight",
+    "historyEnabled": true,
     "defaultValue": 0.0,
+    "tagType": "AtomicTag",
+    "opcServer": "Ignition OPC UA Server"
+  },
+  {
+    "valueSource": "memory",
+    "opcItemPath": "ns\u003d1;s\u003d[CentralSim]_Meta:Refrigeration/Compressor2/percentLoaded",
+    "dataType": "Float8",
+    "historyProvider": "Historian Splitter",
+    "name": "Rice Inventory",
+    "historyEnabled": true,
+    "defaultValue": 200.0,
     "tagType": "AtomicTag",
     "opcServer": "Ignition OPC UA Server"
   }

@@ -2,7 +2,9 @@
   {
     "valueSource": "memory",
     "dataType": "Float8",
+    "historyProvider": "Historian Splitter",
     "name": "Rice Conveyor",
+    "historyEnabled": true,
     "defaultValue": 0.0,
     "engUnit": "RPM",
     "tagType": "AtomicTag"
@@ -10,23 +12,29 @@
   {
     "valueSource": "memory",
     "dataType": "Float8",
-    "name": "Mixer Motor",
-    "defaultValue": 0.0,
-    "tagType": "AtomicTag"
-  },
-  {
-    "valueSource": "memory",
-    "dataType": "Float8",
-    "name": "Exit Valve",
-    "defaultValue": 0.0,
-    "tagType": "AtomicTag"
-  },
-  {
-    "valueSource": "memory",
-    "dataType": "Float8",
+    "historyProvider": "Historian Splitter",
     "name": "Beans Conveyor",
+    "historyEnabled": true,
     "defaultValue": 0.0,
     "engUnit": "RPM",
+    "tagType": "AtomicTag"
+  },
+  {
+    "valueSource": "memory",
+    "dataType": "Float8",
+    "historyProvider": "Historian Splitter",
+    "name": "Mixer Motor",
+    "historyEnabled": true,
+    "defaultValue": 0.0,
+    "tagType": "AtomicTag"
+  },
+  {
+    "valueSource": "memory",
+    "dataType": "Float8",
+    "historyProvider": "Historian Splitter",
+    "name": "Exit Valve",
+    "historyEnabled": true,
+    "defaultValue": 0.0,
     "tagType": "AtomicTag"
   }
 ]
