@@ -127,6 +127,7 @@
         "type": "POST",
         "cookiesEnabled": true,
         "connectionTimeout": 30000,
+        "httpVersion": "HTTP_2",
         "url": {
           "data": "\"http://localhost:8088/system/webdev/event-streams/exchange/event-streams/handler-web-dev\"",
           "type": "EXPRESSION"
