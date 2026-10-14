@@ -1,0 +1,19 @@
+[
+  {
+    "valueSource": "memory",
+    "alarms": [
+      {
+        "setpointA": 1.0,
+        "name": "Alarm"
+      }
+    ],
+    "name": "test alarme",
+    "tagType": "AtomicTag"
+  },
+  {
+    "valueSource": "memory",
+    "dataType": "String",
+    "name": "colorfill",
+    "tagType": "AtomicTag"
+  }
+]

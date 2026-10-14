@@ -1,0 +1,87 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {},
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "AlarmStatusTable"
+        },
+        "position": {
+          "grow": 1
+        },
+        "type": "ia.display.alarmstatustable"
+      },
+      {
+        "children": [
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\tsource \u003d self.parent.parent.getChild(\"AlarmStatusTable\").props.selection.active.data[0].source\n\tsourceParts \u003d source.split(\":/\")\n\ttagPath \u003d \"[%s]%s\" % (sourceParts[0].split(\":\")[1], sourceParts[1].split(\":\")[1])\n\talarmName \u003d sourceParts[2].split(\":\")[1]\n\tsystem.perspective.openPopup(\"alarmPopup\", \"AlarmRationalization/Alarm Popup\", {\"tagPath\":tagPath, \"alarmName\":alarmName}, title\u003d\"Alarm Details\", showCloseIcon\u003dTrue, draggable\u003dTrue, resizable\u003dTrue, modal\u003dTrue, overlayDismiss\u003dTrue)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button"
+            },
+            "position": {
+              "basis": "250px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.enabled": {
+                "binding": {
+                  "config": {
+                    "expression": "len({.../AlarmStatusTable.props.selection.active.data}) \u003e 0"
+                  },
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "image": {
+                "icon": {
+                  "path": "material/check"
+                }
+              },
+              "style": {
+                "marginRight": "5px"
+              },
+              "text": "Alarm Rationalization Details"
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "marginTop": "10px"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "backgroundColor": "var(--containerRoot)",
+        "padding": "10px"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

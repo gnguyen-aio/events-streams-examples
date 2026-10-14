@@ -1,0 +1,11 @@
+{
+  "base": {
+    "style": {
+      "color": "var(--neutral-70)",
+      "fontSize": "12px",
+      "fontWeight": "bolder",
+      "textTransform": "uppercase",
+      "fill": "var(--neutral-70)"
+    }
+  }
+}

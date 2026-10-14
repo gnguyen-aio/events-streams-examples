@@ -1,0 +1,153 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "height": 200,
+      "width": 455
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "PieChart"
+        },
+        "position": {
+          "basis": "200px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "custom.config": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "direct",
+                "tagPath": "AlarmRationalization/Configuration"
+              },
+              "type": "tag"
+            }
+          },
+          "position.display": {
+            "binding": {
+              "config": {
+                "expression": "len({this.props.data}) \u003e 0"
+              },
+              "type": "expr"
+            }
+          },
+          "props.colors[0]": {
+            "binding": {
+              "config": {
+                "path": "this.custom.config.PriorityColors.Diagnostic"
+              },
+              "type": "property"
+            }
+          },
+          "props.colors[1]": {
+            "binding": {
+              "config": {
+                "path": "this.custom.config.PriorityColors.Low"
+              },
+              "type": "property"
+            }
+          },
+          "props.colors[2]": {
+            "binding": {
+              "config": {
+                "path": "this.custom.config.PriorityColors.Medium"
+              },
+              "type": "property"
+            }
+          },
+          "props.colors[3]": {
+            "binding": {
+              "config": {
+                "path": "this.custom.config.PriorityColors.High"
+              },
+              "type": "property"
+            }
+          },
+          "props.colors[4]": {
+            "binding": {
+              "config": {
+                "path": "this.custom.config.PriorityColors.Critical"
+              },
+              "type": "property"
+            }
+          },
+          "props.data": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "alarmsWithRationalization": "{AlarmRationalization/AlarmsWithRationalization}",
+                  "alarmsWithRationalizationAttention": "{AlarmRationalization/AlarmsWithRationalizationAttention}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\tpriority \u003d {\"Diagnostic\":0, \"Low\":0, \"Medium\":0, \"High\":0, \"Critical\":0}\n\t\t\t\n\tif len(value[\"alarmsWithRationalization\"]) \u003d\u003d 0 and len(value[\"alarmsWithRationalizationAttention\"]) \u003d\u003d 0:\n\t\treturn []\n\t\t\t\n\tfor alarm in value[\"alarmsWithRationalization\"]:\n\t\tpriority[alarm[\"alarmDetails\"][\"priority\"][\"value\"]] +\u003d 1\n\t\t\n\tfor alarm in value[\"alarmsWithRationalizationAttention\"]:\n\t\tpriority[alarm[\"alarmDetails\"][\"priority\"][\"value\"]] +\u003d 1\n\t\n\treturn [\n\t\t{\"priority\":\"Diagnostic\", \"value\":priority[\"Diagnostic\"]},\n\t\t{\"priority\":\"Low\", \"value\":priority[\"Low\"]},\n\t\t{\"priority\":\"Medium\", \"value\":priority[\"Medium\"]},\n\t\t{\"priority\":\"High\", \"value\":priority[\"High\"]},\n\t\t{\"priority\":\"Critical\", \"value\":priority[\"Critical\"]}\n\t]",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        },
+        "props": {
+          "colors": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "legend": {
+            "fontSize": 12
+          },
+          "showLegend": false,
+          "valueFormat": {
+            "showValueAsPercent": false
+          }
+        },
+        "type": "ia.chart.pie"
+      },
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "expression": "len({../PieChart.props.data}) \u003d 0"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "AlarmRationalization/Property"
+          },
+          "text": "No Rationalized Alarms"
+        },
+        "type": "ia.display.label"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "overflow": "hidden"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

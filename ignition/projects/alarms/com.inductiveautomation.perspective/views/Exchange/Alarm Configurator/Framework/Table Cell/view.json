@@ -1,0 +1,230 @@
+{
+  "custom": {},
+  "params": {
+    "rowData": {
+      "bindType": "",
+      "bindable": true,
+      "dropdown": true,
+      "enabled": 0,
+      "options": [
+        {
+          "label": "value",
+          "value": 0
+        }
+      ],
+      "propName": "",
+      "underlyingName": "",
+      "value": ""
+    }
+  },
+  "propConfig": {
+    "params.rowData": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 24,
+      "width": 195
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Dropdown"
+        },
+        "position": {
+          "basis": "100%",
+          "grow": 1
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData"
+              },
+              "transforms": [
+                {
+                  "code": "\t# if property is listable, \u0027dropdown\u0027 param will be true (display the dropdown)\n\t\n\treturn value[\u0027dropdown\u0027]",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.options": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData"
+              },
+              "transforms": [
+                {
+                  "code": "\t# return the dropdown options that were passed in as a param\n\t\n\treturn value[\u0027options\u0027]",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.value": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData"
+              },
+              "transforms": [
+                {
+                  "code": "\t# display the current listable property value rather than displaying \u0027Select One\u0027\n\t\n\toptions \u003d value[\u0027options\u0027]\n\tif options \u003d\u003d None:\n\t\treturn None\n\telse:\n\t\t# listable property is set to default value (\u0027value\u0027 param is None)\n\t\tif value[\u0027value\u0027] \u003d\u003d None:\n\t\t\tdefaultVal \u003d value[\u0027default\u0027]\n\t\t\tfor option in options:\n\t\t\t\tif defaultVal \u003d\u003d option[\u0027label\u0027]:\n\t\t\t\t\treturn option[\u0027value\u0027]\n\t\t\treturn None\n\t\telse:\n\t\t\t# listable property set to non-default value\n\t\t\tfor option in options:\n\t\t\t\tif str(value[\u0027value\u0027]) \u003d\u003d option[\u0027label\u0027]:\n\t\t\t\t\treturn option[\u0027value\u0027]\n\t\t\t\n\t\t\treturn None",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            },
+            "onChange": {
+              "enabled": null,
+              "script": "\t# a listable property\u0027s value was changed\n\t\n\tif currentValue.value !\u003d None and str(origin) not in [\u0027Binding\u0027,\u0027Script\u0027]:\n\t\tpropVal \u003d self.props.options[currentValue.value][\u0027label\u0027]\n\t\toldVal \u003d self.view.params.rowData.value\n\t\t\n\t\t# if new value is selected, get value and property name, and send this info to propChange\n\t\tif propVal !\u003d oldVal:\n\t\t\tpropName \u003d self.view.params.rowData[\u0027underlyingName\u0027]\n\t\t\tpropVal \u003d self.props.options[currentValue.value][\u0027label\u0027]\n\n\t\t\t# for pipeline properties, if \u0027\u003cNone\u003e\u0027 is selected, empty string needs to be sent to propChange\n\t\t\tif propName in [\u0027ackPipeline\u0027,\u0027activePipeline\u0027,\u0027clearPipeline\u0027] and propVal \u003d\u003d \u0027\u003cNone\u003e\u0027:\n\t\t\t\tpropVal \u003d \u0027\u0027\n\t\t\t\n\t\t\tlogger \u003d system.util.getLogger(\u0027configurator.tablecell\u0027)\n\t\t\tlogger.debug(\u0027dropdown selection changed; prop name\u003d \u0027 + propName + \u0027; val\u003d \u0027 + str(propVal))\n\t\t\t\n\t\t\tpayload \u003d {\u0027propName\u0027:propName,\u0027propVal\u0027:propVal}\n\t\t\tsystem.perspective.sendMessage(\"propChange\",payload\u003dpayload,scope\u003d\"page\")"
+            }
+          }
+        },
+        "props": {
+          "placeholder": {
+            "color": "--neutral-100",
+            "text": ""
+          },
+          "search": {
+            "enabled": false
+          },
+          "style": {
+            "backgroundColor": "--neutral-10",
+            "borderStyle": "hidden",
+            "borderWidth": 1,
+            "color": "--neutral-100",
+            "outlineWidth": "1"
+          }
+        },
+        "type": "ia.input.dropdown"
+      },
+      {
+        "meta": {
+          "name": "Text Field"
+        },
+        "position": {
+          "basis": "100%",
+          "grow": 1
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "expression": "!{../Dropdown.position.display}"
+              },
+              "type": "expr"
+            }
+          },
+          "props.enabled": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData"
+              },
+              "transforms": [
+                {
+                  "code": "\t# if property has a binding, text field should be disabled\n\t\n\tif \u0027bindType\u0027 in value.keys():\n\t\treturn False\n\telif \u0027enabled\u0027 in value.keys():\n\t\tif value[\u0027enabled\u0027] \u003d\u003d 0:\n\t\t\treturn False\n\t\telse:\n\t\t\treturn True\n\telse:\n\t\t# if property is \u0027Name\u0027, then check \u0027enabled\u0027 param because\n\t\t# name may not be editable if alarm is a UDT alarm\n\t\tif value[\u0027propName\u0027][\u0027value\u0027] \u003d\u003d \u0027Name\u0027:\n\t\t\treturn value[\u0027enabled\u0027]\n\t\telse:\n\t\t\treturn True",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.style.backgroundColor": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData"
+              },
+              "transforms": [
+                {
+                  "code": "\t# if text field is disabled, return darker grey for background\n\t\n\tif \u0027enabled\u0027 in value.keys():\n\t\tif value[\u0027enabled\u0027] \u003d\u003d False:\n\t\t\treturn \u0027--neutral-30\u0027\n\t\telse:\n\t\t\treturn \u0027--neutral-10\u0027\n\telse:\n\t\treturn \u0027--neutral-10\u0027",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData"
+              },
+              "transforms": [
+                {
+                  "code": "\t# display the current value of the non-listable property\n\t\n\tself.props.text \u003d \u0027\u0027\n\tif value[\u0027value\u0027] \u003d\u003d None:\n\t\treturn \u0027\u0027\n\telse:\n\t\treturn value[\u0027value\u0027]\t\t",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            },
+            "onChange": {
+              "enabled": null,
+              "script": "\t# a non-listable property\u0027s value was changed\n\t\n\tpropVal \u003d currentValue.value\n\toldVal \u003d self.view.params.rowData.value\n\tif propVal !\u003d oldVal and str(origin) not in [\u0027Binding\u0027,\u0027Script\u0027]:\n\t\tpropName \u003d self.view.params.rowData[\u0027underlyingName\u0027]\n\t\tpropVal \u003d currentValue.value\n\t\t\n\t\tfoundDuplicateName \u003d 0\n\t\t\n\t\t# if \u0027Name\u0027 property is changed, check the names of the other alarms for\n\t\t# this tag (cannot have duplicate alarm name on same tag)\n\t\tif propName \u003d\u003d \u0027name\u0027:\n\t\t\texistingAlarmNames \u003d self.view.params.rowData[\u0027existingAlarmNames\u0027]\n\t\t\tif propVal in existingAlarmNames:\n\t\t\t\tfoundDuplicateName \u003d 1\n\t\t\t\tsystem.perspective.openPopup(\"duplicate-alarm\",\u0027Exchange/Alarm Configurator/Framework/Popup\u0027, params \u003d {\u0027title\u0027:\u0027Error\u0027,\u0027body\u0027:\u0027This tag already has an alarm with this name: \u0027 + str(propVal),\u0027id\u0027:\u0027duplicate-alarm\u0027},showCloseIcon\u003dFalse,draggable\u003dFalse,viewportBound\u003dTrue,overlayDismiss\u003dTrue,modal\u003dTrue)\n\t\t\n\t\t# if foundDuplicateName is 0, then either the \u0027Name\u0027 property was changed \n\t\t# and the new name was unique, or a different non-listable property was \n\t\t# changed and the new value was different than the old value; send the \n\t\t# property name and property value to propChange\n\t\tif foundDuplicateName \u003d\u003d 0:\n\t\t\tpayload \u003d {\u0027propName\u0027:propName,\u0027propVal\u0027:propVal}\n\t\t\t\n\t\t\tlogger \u003d system.util.getLogger(\u0027configurator.tablecell\u0027)\n\t\t\tlogger.debug(\u0027text in the textfield has changed; prop name\u003d \u0027 + propName + \u0027; val\u003d \u0027 + str(propVal))\n\t\t\t\n\t\t\tsystem.perspective.sendMessage(\"propChange\",payload\u003dpayload,scope\u003d\"page\")\n\t\telse:\n\t\t\tself.refreshBinding(\u0027props.text\u0027)\n"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "borderStyle": "none",
+            "color": "--neutral-100",
+            "marginLeft": "8px",
+            "outlineStyle": "none"
+          }
+        },
+        "type": "ia.input.text-field"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\t# retrieve info from params and pass this info to updateBindingEditor\n\t\n\trowData \u003d self.view.params.rowData\n\t\n\t# grab the underlying name (for example: ackMode vs Ack Mode)\n\tpropName \u003d rowData[\u0027underlyingName\u0027]\n\t\n\t# property already has a binding, form \u0027prop\u0027 object\n\tif \u0027bindType\u0027 in rowData.keys():\n\t\tbindType \u003d rowData[\u0027bindType\u0027]\n\t\tbinding \u003d rowData[\u0027value\u0027]\n\t\tprop \u003d {propName: {\u0027bindType\u0027: bindType, \u0027value\u0027: binding}}\n\telse:\n\t\t# property does not have a binding\n\t\tprop \u003d {}\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.tablecell\u0027)\n\tlogger.debug(\u0027the bind icon was pressed; prop name\u003d \u0027 + propName + \u0027; prop\u003d \u0027 + str(prop))\n\t\n\tpayload \u003d {\u0027name\u0027:propName,\u0027prop\u0027:prop,\u0027displayName\u0027:self.view.params.rowData.propName[\u0027value\u0027]}\t\n\t\t\t\n\tsystem.perspective.sendMessage(\"updateBindingEditor\", payload \u003d payload, scope \u003d \"page\")"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Bind"
+        },
+        "position": {
+          "basis": "20px"
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData"
+              },
+              "transforms": [
+                {
+                  "code": "\t# if property is bindable, then \u0027bindable\u0027 param will be true (display bind icon)\n\t\n\tif value[\u0027enabled\u0027] \u003d\u003d 1:\n\t\treturn bool(value[\u0027bindable\u0027])\n\telse:\n\t\treturn False",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "path": "material/link",
+          "style": {
+            "classes": "exchange/alarm-configurator/icon"
+          }
+        },
+        "type": "ia.display.icon"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "type": "ia.container.flex"
+  }
+}

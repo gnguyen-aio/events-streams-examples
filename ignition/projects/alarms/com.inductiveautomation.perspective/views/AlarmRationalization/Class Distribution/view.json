@@ -1,0 +1,113 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "height": 200,
+      "width": 455
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "PieChart"
+        },
+        "position": {
+          "basis": "200px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "custom.config": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "direct",
+                "tagPath": "AlarmRationalization/Configuration"
+              },
+              "type": "tag"
+            }
+          },
+          "position.display": {
+            "binding": {
+              "config": {
+                "expression": "len({this.props.data}) \u003e 0"
+              },
+              "type": "expr"
+            }
+          },
+          "props.data": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "alarmsWithRationalization": "{AlarmRationalization/AlarmsWithRationalization}",
+                  "alarmsWithRationalizationAttention": "{AlarmRationalization/AlarmsWithRationalizationAttention}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\tclasses \u003d {}\n\t\t\t\n\tfor alarm in value[\"alarmsWithRationalization\"]:\n\t\tfor alarmClass in alarm[\"alarmDetails\"][\"rationalization\"][\"rClass\"].split(\",\"):\n\t\t\tif alarmClass not in classes:\n\t\t\t\tclasses[alarmClass] \u003d 0\n\t\t\tclasses[alarmClass] +\u003d 1\n\t\t\n\tfor alarm in value[\"alarmsWithRationalizationAttention\"]:\n\t\tfor alarmClass in alarm[\"alarmDetails\"][\"rationalization\"][\"rClass\"].split(\",\"):\n\t\t\tif alarmClass not in classes:\n\t\t\t\tclasses[alarmClass] \u003d 0\n\t\t\tclasses[alarmClass] +\u003d 1\n\t\n\tret \u003d []\n\tfor alarmClass in classes:\n\t\tret.append({\"alarmClass\":alarmClass, \"value\":classes[alarmClass]})\n\treturn ret",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        },
+        "props": {
+          "colors": [
+            "#3366CC",
+            "#EC4B3D",
+            "#4FC86C",
+            "#00A9C6",
+            "#E69300"
+          ],
+          "legend": {
+            "fontSize": 12
+          },
+          "showLegend": false,
+          "valueFormat": {
+            "showValueAsPercent": false
+          }
+        },
+        "type": "ia.chart.pie"
+      },
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "expression": "len({../PieChart.props.data}) \u003d 0"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "AlarmRationalization/Property"
+          },
+          "text": "No Rationalized Alarms"
+        },
+        "type": "ia.display.label"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "overflow": "hidden"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

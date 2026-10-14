@@ -1,0 +1,45 @@
+{
+  "pages": {
+    "/": {
+      "docks": {
+        "bottom": [
+          {
+            "anchor": "fixed",
+            "autoBreakpoint": 480,
+            "content": "cover",
+            "handle": "show",
+            "iconUrl": "material/alarm",
+            "id": "",
+            "modal": false,
+            "resizable": true,
+            "show": "onDemand",
+            "size": 250,
+            "viewParams": {},
+            "viewPath": "AlarmRationalization/Alarms"
+          }
+        ],
+        "right": [
+          {
+            "anchor": "fixed",
+            "autoBreakpoint": 480,
+            "content": "push",
+            "handle": "hide",
+            "iconUrl": "material/settings",
+            "id": "alarmConfig",
+            "modal": false,
+            "resizable": true,
+            "show": "onDemand",
+            "size": 500,
+            "viewParams": {},
+            "viewPath": "Exchange/Alarm Configurator/Alarm Configurator"
+          }
+        ]
+      },
+      "title": "",
+      "viewPath": "AlarmRationalization/Dashboard"
+    }
+  },
+  "sharedDocks": {
+    "cornerPriority": "top-bottom"
+  }
+}

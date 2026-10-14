@@ -1,0 +1,68 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "height": 147,
+      "width": 258
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "AlarmRationalization/Label",
+            "marginBottom": "10px"
+          },
+          "text": "Drag your CSV to rationalize alarms in bulk."
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "events": {
+          "component": {
+            "onFileReceived": {
+              "config": {
+                "script": "\timport traceback\n\tcsvData \u003d event.file.getString()\n\ttry:\n\t\tAlarmRationalization.Alarms.importFromCSV(csvData)\n\texcept:\n\t\tAlarmRationalization.Popup.showMessage(\"Upload failed. Please ensure the CSV is valid and try again.\")\n\t\tself.print(str(traceback.format_exc()))"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "FileUpload"
+        },
+        "position": {
+          "basis": "150px",
+          "grow": 1
+        },
+        "props": {
+          "fileSizeLimit": 100,
+          "maxUploads": 1,
+          "supportedFileTypes": [
+            "csv"
+          ]
+        },
+        "type": "ia.input.fileupload"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "overflow": "hidden"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

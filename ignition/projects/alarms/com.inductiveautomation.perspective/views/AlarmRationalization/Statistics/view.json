@@ -1,0 +1,507 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "height": 200,
+      "width": 300
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Label"
+              },
+              "text": "Total Tags"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Value"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "expression": "now(0)"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\ttry:\n\t\tfrom com.inductiveautomation.ignition.gateway import IgnitionGateway\n\t\tcontext \u003d IgnitionGateway.get()\n\t\ttagManager \u003d context.getTagManager()\n\t\ttagCount \u003d 0\n\t\tfor tagProvider in tagManager.getTagProviders():\n\t\t\ttagCount +\u003d tagProvider.getStatusInformation().get().getTagCount()\n\t\treturn tagCount\n\texcept:\n\t\treturn 0",
+                      "type": "script"
+                    },
+                    {
+                      "expression": "if({value} \u003d null, 0, numberFormat({value}, \"#,##0\"))",
+                      "type": "expression"
+                    }
+                  ],
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Value"
+              }
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "Total Tags"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "AlarmRationalization/Row"
+          },
+          "wrap": "wrap"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Label"
+              },
+              "text": "Total Alarms"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Value"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarmsWithRationalization": "{AlarmRationalization/AlarmsWithRationalization}",
+                      "alarmsWithoutRationalization": "{AlarmRationalization/AlarmsWithoutRationalization}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\treturn len(value[\"alarmsWithoutRationalization\"]) + len(value[\"alarmsWithRationalization\"])",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Value"
+              }
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "Total Alarms"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "AlarmRationalization/Row"
+          },
+          "wrap": "wrap"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Label"
+              },
+              "text": "Alarms w/o Rationalization"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Value"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "fallbackDelay": 2.5,
+                    "mode": "direct",
+                    "tagPath": "AlarmRationalization/AlarmsWithoutRationalization"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\treturn len(value)",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "tag"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Value"
+              }
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "Total Alarms Without Rationalization"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "AlarmRationalization/Row"
+          },
+          "wrap": "wrap"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Label"
+              },
+              "text": "Alarms w/ Rationalization"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Value"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "fallbackDelay": 2.5,
+                    "mode": "direct",
+                    "tagPath": "AlarmRationalization/AlarmsWithRationalization"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\treturn len(value)",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "tag"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Value"
+              }
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "Total Alarms With Rationalization"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "AlarmRationalization/Row"
+          },
+          "wrap": "wrap"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Label"
+              },
+              "text": "Alarms w/ Needs Attention"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Value"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "fallbackDelay": 2.5,
+                    "mode": "direct",
+                    "tagPath": "AlarmRationalization/AlarmsWithRationalizationAttention"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\treturn len(value)",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "tag"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Value"
+              }
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "Total Alarms With Needs Attention"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "AlarmRationalization/Row"
+          },
+          "wrap": "wrap"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Label"
+              },
+              "text": "Last Check"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Value"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "expression": "dateFormat({AlarmRationalization/LastCheck}, \"M/d/yy h:mm a\")"
+                  },
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Value"
+              }
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "Last Check"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "AlarmRationalization/Row"
+          },
+          "wrap": "wrap"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Label"
+              },
+              "text": "Last Check Duration (ms)"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Value"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "fallbackDelay": 2.5,
+                    "mode": "direct",
+                    "tagPath": "AlarmRationalization/LastCheckDurationMS"
+                  },
+                  "type": "tag"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Value"
+              }
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "Last Check Duration"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "AlarmRationalization/Row"
+          },
+          "wrap": "wrap"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "events": {
+          "component": {
+            "onActionPerformed": {
+              "config": {
+                "script": "\n\timport java.lang.Exception\n\n\ttry:\n\t\tAlarmRationalization.Alarms.checkAlarms()\n\t\t\n\texcept (Exception, java.lang.Exception) as e:\n\t\t\n\t\tsystem.util.getLogger(\"AlarmRationalization.Dashboard.CheckNowButton\").error(\"%s\" % e)\n\t\t\n\t\terror \u003d \"\"\"\n\t\t\tUnable to check alarms. \n\t\t\tVerify the resource is configured correctly. \n\t\t\tFor more information, see Gateway log.\n\t\t\"\"\"\n\t\tsystem.perspective.openPopup(\n\t\t\t\u0027message\u0027,\n\t\t\t\u0027AlarmRationalization/Message\u0027, \n\t\t\tparams \u003d {\"display\": error, \"class\": \"SmallText\"}, \n\t\t\tresizable \u003d True,\n\t\t\tmodal \u003d True\n\t\t)\n\t# re-enable the button\n\tfinally:\n\t\tsystem.tag.writeBlocking([\"AlarmRationalization/Running\"], [False])"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Check Now"
+        },
+        "position": {
+          "basis": "34px"
+        },
+        "propConfig": {
+          "props.enabled": {
+            "binding": {
+              "config": {
+                "expression": "!{AlarmRationalization/Running}"
+              },
+              "type": "expr"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "if({AlarmRationalization/Running}, \"Running...\", \"Check Now\")"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "image": {
+            "icon": {
+              "path": "material/refresh"
+            }
+          },
+          "style": {
+            "marginTop": "5px"
+          }
+        },
+        "type": "ia.input.button"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}

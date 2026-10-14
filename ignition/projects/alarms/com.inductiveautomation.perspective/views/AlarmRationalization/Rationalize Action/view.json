@@ -1,0 +1,74 @@
+{
+  "custom": {},
+  "params": {
+    "attention": false,
+    "value": {}
+  },
+  "propConfig": {
+    "params.attention": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.value": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 24,
+      "width": 24
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "events": {
+          "dom": {
+            "onClick": [
+              {
+                "config": {
+                  "params": {
+                    "alarmObj": "{view.params.value}",
+                    "attention": "{view.params.attention}"
+                  },
+                  "view": "AlarmRationalization/Rationalize Alarm"
+                },
+                "scope": "C",
+                "type": "nav"
+              },
+              {
+                "config": {
+                  "id": "alarmConfig",
+                  "type": "open",
+                  "viewParams": {
+                    "alarmObj": "{view.params.value}"
+                  }
+                },
+                "scope": "C",
+                "type": "dock"
+              }
+            ]
+          }
+        },
+        "meta": {
+          "name": "Icon"
+        },
+        "position": {
+          "basis": "30px"
+        },
+        "props": {
+          "path": "material/settings",
+          "style": {
+            "cursor": "pointer"
+          }
+        },
+        "type": "ia.display.icon"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "type": "ia.container.flex"
+  }
+}

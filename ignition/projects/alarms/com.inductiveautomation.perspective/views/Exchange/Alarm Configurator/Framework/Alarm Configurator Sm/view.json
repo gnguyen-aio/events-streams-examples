@@ -1,0 +1,569 @@
+{
+  "custom": {},
+  "params": {
+    "alarmProp": {},
+    "displayName": "",
+    "items": "",
+    "loadedTagConfig": {},
+    "permissions": {
+      "associatedDataMode": "ViewEdit",
+      "canAddAlarm": true,
+      "canDeleteAlarm": true,
+      "enabledProps": []
+    },
+    "propName": "",
+    "selectedRow": null,
+    "selection": "",
+    "selectionData": {},
+    "tag": "",
+    "tagConfig": {},
+    "udtDefAlarms": []
+  },
+  "propConfig": {
+    "params.alarmProp": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.displayName": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.item_path": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.items": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.loadedTagConfig": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.permissions": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.propName": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.selectedRow": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.selection": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.selectionData": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.tag": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.tagConfig": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.udtDefAlarms": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 846,
+      "width": 1000
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Alarm Icon"
+            },
+            "position": {
+              "basis": "30px"
+            },
+            "props": {
+              "color": "--neutral-10",
+              "path": "material/alarm",
+              "style": {
+                "marginLeft": "1%"
+              }
+            },
+            "type": "ia.display.icon"
+          },
+          {
+            "meta": {
+              "name": "Title"
+            },
+            "position": {
+              "basis": "98%",
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/alarm-configurator/font",
+                "fontSize": 25,
+                "paddingBottom": "0.5%",
+                "paddingLeft": "0.2%",
+                "paddingTop": "0.5%"
+              },
+              "text": "Alarm Configurator"
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "Header"
+        },
+        "position": {
+          "basis": "50px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "exchange/alarm-configurator/color"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Tag"
+            },
+            "position": {
+              "basis": "98%",
+              "grow": 1
+            },
+            "propConfig": {
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.text"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# calculate the font size based on the number of characters in the tag path;\n\t# font size cannot be smaller than 8px\n\t\n\ttagPathLength \u003d len(value)\n\tfontSize \u003d 17 - (0.027027*tagPathLength)\n\tif fontSize \u003c 8:\n\t\treturn \u00278px\u0027\n\telse:\n\t\treturn str(fontSize) + \u0027px\u0027",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.tagConfig"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# display the path of the selected tag so that the user knows which tag they\n\t# are editing the alarms for when they are viewing the property editor\n\t\n\tif len(value.keys()) \u003e 0:\n\t\treturn \u0027Tag: \u0027 + str(value[\u0027path\u0027])\n\telse:\n\t\treturn \u0027Tag:\u0027",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/alarm-configurator/font exchange/alarm-configurator/framework/alarm-configurator-sm/mobile-tag-path-header",
+                "marginLeft": "10px"
+              }
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "Property Editor Header"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "exchange/alarm-configurator/color"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Settings Icon"
+                    },
+                    "position": {
+                      "basis": "20px"
+                    },
+                    "props": {
+                      "color": "--neutral-10",
+                      "path": "material/settings",
+                      "style": {
+                        "marginBottom": "2px",
+                        "marginLeft": "5px",
+                        "marginRight": "5px"
+                      }
+                    },
+                    "type": "ia.display.icon"
+                  },
+                  {
+                    "meta": {
+                      "name": "Title"
+                    },
+                    "position": {
+                      "basis": "80%",
+                      "grow": 1
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "exchange/alarm-configurator/font",
+                        "fontSize": 16
+                      },
+                      "text": "Property Editor"
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "Title"
+                },
+                "position": {
+                  "basis": "35px",
+                  "shrink": 0
+                },
+                "props": {
+                  "alignItems": "center",
+                  "style": {
+                    "classes": "exchange/alarm-configurator/color"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "meta": {
+                  "name": "Alarm Properties"
+                },
+                "position": {
+                  "basis": "500px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "if({..../Properties Cont.position.display} \u003d true \u0026\u0026 len({view.params.propName}) \u003d 0, true, false)"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.params.alarm": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "selectedRow": "{view.params.selectedRow}",
+                          "tagConfig": "{view.params.tagConfig}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# when the tagConfig or selectedRow param changes, this determines either which\n\t# alarm object should be passed to the property editor, or if an empty object\n\t# should be passed (because no alarm is selected)\n\t\n\tselectedRow \u003d value[\u0027selectedRow\u0027]\n\tconfig \u003d value[\u0027tagConfig\u0027]\n\t\n\tif selectedRow \u003d\u003d None:\n\t\treturn {}\n\telse:\n\t\t# selectedRow not equal to None, find the alarm in the tagConfig alarm list\n\t\t# and return the object\n\t\tif \u0027alarms\u0027 in config.keys():\n\t\t\tlogger \u003d system.util.getLogger(\u0027configurator.sm.properties\u0027)\n\t\t\tlogger.debug(\u0027alarm param populated; alarm\u003d \u0027 + str(config[\u0027alarms\u0027][selectedRow]))\n\t\t\n\t\t\treturn config[\u0027alarms\u0027][selectedRow]\n\t\telse:\n\t\t\treturn {}",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  },
+                  "props.params.allAlarmNames": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.tagConfig"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# in order to prevent duplicate alarm names, pass in the names for all the\n\t# alarms that this tag has; then, when user changes alarm name, can check\n\t# to see if it is a duplicate or not\n\t\n\tif len(value.keys()) \u003e 0:\n\t\talarmNames \u003d []\n\t\tif \u0027alarms\u0027 in value.keys():\n\t\t\tfor alarm in value[\u0027alarms\u0027]:\n\t\t\t\talarmNames.append(alarm[\u0027name\u0027])\n\t\treturn alarmNames\n\telse:\n\t\treturn []",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.associatedDataMode": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.permissions.associatedDataMode"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.enabledProps": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.permissions.enabledProps"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.udtAlarm": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.alarm"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# check to see if this alarm is a UDT alarm, and if it is, get the object\n\t# that represents the alarm in the UDT definition and pass it to the\n\t# property editor; if this alarm is not a UDT alarm, then return an empty object\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.sm.properties\u0027)\n\t\n\tif \u0027name\u0027 in value.keys():\n\t\tcurrAlarmName \u003d value[\u0027name\u0027]\n\telse:\n\t\tcurrAlarmName \u003d \u0027Alarm\u0027\n\t\t\n\tfor alarm in self.view.params.udtDefAlarms:\n\t\tif currAlarmName \u003d\u003d alarm[\u0027name\u0027]:\n\t\t\tlogger.debug(\u0027alarm is a UDT alarm; alarm name\u003d \u0027 + str(currAlarmName))\n\t\t\treturn alarm\n\t\n\tlogger.debug(\u0027alarm is not a UDT alarm; alarm name\u003d \u0027 + str(currAlarmName))\n\treturn {}",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "path": "Exchange/Alarm Configurator/Framework/Alarm Properties",
+                  "style": {
+                    "paddingBottom": "2%",
+                    "paddingLeft": "1%",
+                    "paddingRight": "1%",
+                    "paddingTop": "0.5%"
+                  }
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "Binding Editor"
+                },
+                "position": {
+                  "basis": "500px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.propName"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tdisplayBindingEditor \u003d len(value) \u003e 0\n\n\treturn displayBindingEditor",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.alarmName": {
+                    "binding": {
+                      "config": {
+                        "path": "../Alarm Properties.props.params.alarm"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# return the name of the alarm; if \u0027name\u0027 is not in alarm object\u0027s keys,\n\t# then name is set to default \u0027Alarm\u0027\n\t\n\tif \u0027name\u0027 in value.keys():\n\t\treturn value[\u0027name\u0027]\n\telse:\n\t\treturn \u0027\u0027",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.alarmProp": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.alarmProp"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.currTag": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.tag"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.displayName": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.displayName"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.propName": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.propName"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "path": "Exchange/Alarm Configurator/Framework/Binding Editor",
+                  "style": {
+                    "paddingBottom": "2%",
+                    "paddingLeft": "1%",
+                    "paddingRight": "1%",
+                    "paddingTop": "0.5%"
+                  }
+                },
+                "type": "ia.display.view"
+              }
+            ],
+            "meta": {
+              "name": "Properties"
+            },
+            "position": {
+              "basis": "30%",
+              "grow": 1,
+              "shrink": 0
+            },
+            "props": {
+              "direction": "column"
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "Properties Cont"
+        },
+        "position": {
+          "basis": "500px",
+          "grow": 1
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "classes": "exchange/alarm-configurator/main-section"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\tdef sanitizeTree(element):\n\t\t\"\"\"\n\t\tA custom deep copy functon for dicts/lists that converts\n\t\t\tthe Perspective property object wrappers to the\n\t\t\tPython equivalent.\n\t\t\t\n\t\tArgs:\n\t\t\telement: The Perspective property object wrapper.\n\t\t\n\t\tReturns:\n\t\t\tA deep copy (Python equivalent) of the Perspective\n\t\t\tproperty object wrapper passed in (element).\n\t\t\"\"\"\n\t\tif hasattr(element, \u0027__iter__\u0027):\n\t\t\tif hasattr(element, \u0027keys\u0027):\n\t\t\t\treturn dict((k, sanitizeTree(element[k])) for k in element.keys())\n\t\t\telse:\n\t\t\t\treturn list(sanitizeTree(x) for x in element)\n\t\treturn element\n\t\t\n\tdef containsAssociatedData(alarm):\n\t\t\"\"\"\n\t\tChecks to see if the alarm has any associated data properties, and if it\n\t\t\tdoes, creates list of the names of the associated data properties.\n\t\t\t\n\t\tArgs:\n\t\t\talarm: The alarm object being searched.\n\t\t\t\n\t\tReturns:\n\t\t\tA tuple in which the first element is False if the alarm does not\n\t\t\thave any associated data properties, or True if the alarm does\n\t\t\thave associated data prperties, and in which the second element\n\t\t\tis a list that is empty if the alarm does not have associated data \n\t\t\tproperties, or it contains the name of the associated data\n\t\t\tpropertie(s) (if the alarm has at least one).\n\t\t\"\"\"\n\t\tbuiltInProperties \u003d {\u0027name\u0027,\u0027enabled\u0027,\u0027priority\u0027,\u0027timestampSource\u0027,\n\t\t\t\t\t\t\t\t\u0027label\u0027,\u0027displayPath\u0027,\u0027ackMode\u0027,\u0027notes\u0027,\u0027ackNotesReqd\u0027,\n\t\t\t\t\t\t\t\t\u0027shelvingAllowed\u0027,\u0027mode\u0027,\u0027setpointA\u0027,\u0027inclusiveA\u0027,\u0027anyChange\u0027,\n\t\t\t\t\t\t\t\t\u0027setpointB\u0027,\u0027inclusiveB\u0027,\u0027bitPosition\u0027,\u0027bitOnZero\u0027,\u0027isActive\u0027,\n\t\t\t\t\t\t\t\t\u0027deadband\u0027,\u0027deadbandMode\u0027,\u0027timeOnDelaySeconds\u0027,\u0027timeOffDelaySeconds\u0027,\n\t\t\t\t\t\t\t\t\u0027ackPipeline\u0027,\u0027activePipeline\u0027,\u0027clearPipeline\u0027,\u0027voip_customMessage\u0027,\n\t\t\t\t\t\t\t\t\u0027CustomEmailMessage\u0027,\u0027CustomEmailSubject\u0027,\u0027CustomSmsMessage\u0027,\u0027activeCondition\u0027}\n\t\tif set(alarm.keys()).issubset(builtInProperties) \u003d\u003d True:\n\t\t\treturn (False,[])\n\t\telse:\n\t\t\t# return a list of associated data props\n\t\t\treturn (True,[prop for prop in alarm.keys() if prop not in builtInProperties])\n\t\n\t# after making changes to alarms for the tag, time to commit the changes\n\tconfig \u003d sanitizeTree(self.view.params.tagConfig)\n\tif len(config.keys()) \u003d\u003d 0:\n\t\tsystem.perspective.openPopup(\"commit-warning\",\u0027Exchange/Alarm Configurator/Framework/Popup\u0027, params \u003d {\u0027title\u0027:\u0027Error\u0027,\u0027body\u0027:\u0027No tag selected.\u0027,\u0027id\u0027:\u0027commit-warning\u0027},showCloseIcon\u003dFalse,draggable\u003dFalse,viewportBound\u003dTrue,overlayDismiss\u003dTrue,modal\u003dTrue)\n\telse:\n\t\t# when editing the mode of an alarm, the \u0027display name\u0027 of the property is saved in the\n\t\t# local tagConfig rather than the \u0027underlying name\u0027; so, if the mode of any alarms was\n\t\t# edited, change the \u0027display name\u0027 to \u0027underlying name\u0027 before sending changes to \n\t\t# system.tag.configure\n\t\talarmModeMap \u003d {None:\u0027Equality\u0027,\u0027Not Equal\u0027:\u0027Inequality\u0027,\u0027Equal\u0027:\u0027Equality\u0027, \u0027Below Setpoint\u0027:\u0027BelowValue\u0027,\u0027Above Setpoint\u0027:\u0027AboveValue\u0027, \u0027Between Setpoints\u0027:\u0027BetweenValues\u0027, \u0027Outside Setpoints\u0027:\u0027OutsideValues\u0027,\u0027Out of range\u0027:\u0027OutOfEngRange\u0027,\u0027Bad Quality\u0027:\u0027BadQuality\u0027,\u0027Any Change\u0027:\u0027AnyChange\u0027,\u0027Bit State\u0027:\u0027Bit\u0027,\u0027On Condition\u0027:\u0027OnCondition\u0027}\n\t\t\n\t\t# get the parent path of the tag\n\t\ttagPath \u003d config[\u0027path\u0027]\n\t\tpathParts \u003d tagPath.split(\u0027]\u0027)\n\t\tprovider \u003d pathParts[0] + \u0027]\u0027\n\t\tpathParts \u003d pathParts[1].split(\u0027/\u0027)\n\t\tparentPath \u003d provider\n\t\tfor i in range(0,len(pathParts)-1):\n\t\t\tparentPath \u003d parentPath + pathParts[i] + \u0027/\u0027\n\t\t\n\t\tif \u0027/\u0027 in parentPath:\n\t\t\tparentPath \u003d parentPath[:-1]\n\n\t\t# get the full current config of the tag and clear out the alarms list\n\t\tcurrConfig \u003d system.tag.getConfiguration(tagPath)[0]\n\t\tcurrConfig[\u0027alarms\u0027] \u003d []\n\t\t\n\t\tcanSave \u003d True\n\t\t\t\t\n\t\t# correcting the mode and changing voip_customMessage back to \n\t\t# voip.customMessage if any of the alarms have this property\n\t\tfor alarm in config[\u0027alarms\u0027]:\n\t\t\tif \u0027mode\u0027 in alarm.keys():\n\t\t\t\toldMode \u003d str(alarm[\u0027mode\u0027])\n\t\t\t\talarm[\u0027mode\u0027] \u003d alarmModeMap[oldMode]\n\t\t\tif \u0027voip_customMessage\u0027 in alarm.keys():\t\t\t\t\n\t\t\t\talarm[\u0027voip.customMessage\u0027] \u003d alarm[\u0027voip_customMessage\u0027]\n\t\t\t\tdel alarm[\u0027voip_customMessage\u0027]\n\t\t\t\n\t\t\tassociatedData \u003d containsAssociatedData(alarm)\n\t\t\tif associatedData[0]:\n\t\t\t\tfor associatedDataProp in associatedData[1]:\n\t\t\t\t\tif alarm[associatedDataProp] \u003d\u003d None:\n\t\t\t\t\t\tcanSave \u003d False\n\t\t\t\t\t\tbreak\n\t\t\t\n\t\t\tcurrConfig[\u0027alarms\u0027].append(alarm)\n\t\t\n\t\tif canSave:\t\t\t\t\n\t\t\tlogger \u003d system.util.getLogger(\u0027configurator.lg.commit\u0027)\n\t\t\tlogger.debug(\u0027commit pressed; new config\u003d \u0027 + str(currConfig) + \u0027; parentpath\u003d \u0027 + str(parentPath))\n\t\t\t\n\t\t\t# call system.tag.configure with parent path to commit the changes\n\t\t\tresults \u003d system.tag.configure(parentPath,currConfig,\u0027o\u0027)\n\t\t\t\n\t\t\t# get the result of the configure, display a popup containing the results, and refresh the tagConfig\n\t\t\t\n\t\t\tbody \u003d \u0027Tag edit successful!\u0027\n\t\t\t\n\t\t\tif str(results[0]) \u003d\u003d \u0027Good\u0027:\n\t\t\t\tbody \u003d \u0027Tag edit successful!\u0027\n\t\t\t\tsystem.perspective.openPopup(\"commit\",\u0027Exchange/Alarm Configurator/Framework/Popup\u0027, params \u003d {\u0027body\u0027:body,\u0027id\u0027:\u0027commit\u0027},showCloseIcon\u003dFalse,draggable\u003dFalse,viewportBound\u003dTrue,overlayDismiss\u003dTrue,modal\u003dTrue)\n\t\t\t\tsystem.perspective.sendMessage(\"refreshTagConfig\", payload \u003d {}, scope \u003d \"page\")\n\t\t\telse:\n\t\t\t\tbody \u003d \u0027Tag edit failed\u0027\n\t\t\t\tsystem.perspective.openPopup(\"commit\",\u0027Exchange/Alarm Configurator/Framework/Edit Failed Popup\u0027, params \u003d {\u0027body\u0027:body,\u0027id\u0027:\u0027commit\u0027,\u0027error\u0027:results.toString()},showCloseIcon\u003dFalse,draggable\u003dFalse,viewportBound\u003dTrue,overlayDismiss\u003dTrue,modal\u003dTrue)\n\t\telse:\n\t\t\tbody \u003d \u0027Unsupported data type detected. Please make these changes in the Designer.\u0027\n\t\t\tsystem.perspective.openPopup(\"commit\",\u0027Exchange/Alarm Configurator/Framework/Popup\u0027, params \u003d {\u0027body\u0027:body,\u0027id\u0027:\u0027commit\u0027},showCloseIcon\u003dFalse,draggable\u003dFalse,viewportBound\u003dTrue,overlayDismiss\u003dTrue,modal\u003dTrue)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Commit"
+            },
+            "position": {
+              "basis": "160px",
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/alarm-configurator/color",
+                "marginRight": "10px"
+              },
+              "text": "Commit"
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\t# reverting any alarm changes that the user made; setting selectedRow of alarm list to none,\n\t# refresh the tagConfig (via send message to refreshTagConfig), hide the alarm list if it is\n\t# being displayed, hide the property editor if it is being displayed, display the tag tree, \n\t# and update the params that are passed to the binding editor (via send message to \n\t# updateBindingEditor)\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.sm.revert\u0027)\n\tlogger.debug(\u0027revert button pressed; setting selectedRow\u003dNone for alarm list and refreshing binding on tagConfig\u0027)\n\t\n\tsystem.perspective.sendMessage(\"updateSelectedRow\", payload \u003d {\u0027row\u0027:None}, scope \u003d \"page\")\n\tself.parent.parent.getChild(\"Alarms\").getChild(\"Alarm Container\").getChild(\"Alarm List\").props.selection.selectedRow \u003d None\n\t\n\tsystem.perspective.sendMessage(\"refreshTagConfig\", payload \u003d {}, scope \u003d \"page\")\n\t\n\tif self.parent.parent.getChild(\"Alarm List Header\").position.display \u003d\u003d True:\n\t\tself.parent.position.display \u003d False\n\t\t\n\t\t# hide alarm list\n\t\tcomponentsToHide \u003d [\"Alarm List Header\",\"Alarms\",\"Edit Alarm\"]\n\t\tfor comp in componentsToHide:\n\t\t\tself.parent.parent.getChild(comp).position.display \u003d False\n\t\t\n\telif self.parent.parent.getChild(\"Property Editor Header\").position.display \u003d\u003d True:\n\t\t# hide property editor\n\t\tcomponentsToHide \u003d [\"Property Editor Header\",\"Properties Cont\"]\n\t\tfor comp in componentsToHide:\n\t\t\tself.parent.parent.getChild(comp).position.display \u003d False\n\t\n\t# show tag tree\n\tcomponentsToShow \u003d [\"Header\",\"Tag Tree\",\"Edit Tag\"]\n\tfor comp in componentsToShow:\n\t\tself.parent.parent.getChild(comp).position.display \u003d True\n\t\n\tpayload \u003d {\u0027name\u0027:\u0027\u0027,\u0027prop\u0027:{},\u0027displayName\u0027:\u0027\u0027}\n\t\t\t\n\tsystem.perspective.sendMessage(\"updateBindingEditor\", payload \u003d payload, scope \u003d \"page\")\t"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Revert"
+            },
+            "position": {
+              "basis": "160px",
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "backgroundColor": "--neutral-90",
+                "color": "--neutral-10"
+              },
+              "text": "Revert"
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "meta": {
+          "name": "Commit And Revert"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "bindingEditorOpen": "{../Properties Cont/Properties/Binding Editor.position.display}",
+                  "tag": "{view.params.tag}",
+                  "tagTreeOpen": "False"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\t# only display \u0027commit\u0027 and \u0027revert\u0027 buttons if a tag is selected,\n\t# the binding editor is not open and the tag tree is not open.\n\t\n\tif len(value[\u0027tag\u0027]) \u003d\u003d 0:\n\t\treturn False\n\telse:\n\t\tif value[\u0027bindingEditorOpen\u0027] \u003d\u003d True or value[\u0027tagTreeOpen\u0027]:\n\t\t\treturn False\n\t\telse:\n\t\t\treturn True",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        },
+        "props": {
+          "alignContent": "space-between",
+          "justify": "flex-end",
+          "style": {
+            "marginBottom": "1%",
+            "marginLeft": "1%",
+            "marginRight": "1%"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "backgroundColor": "--neutral-10"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

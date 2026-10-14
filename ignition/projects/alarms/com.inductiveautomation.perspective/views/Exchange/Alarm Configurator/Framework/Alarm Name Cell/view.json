@@ -1,0 +1,130 @@
+{
+  "custom": {},
+  "params": {
+    "rowData": {
+      "color": "--neutral-40",
+      "enabled": "True",
+      "fontSize": 18,
+      "name": "value",
+      "udt": true
+    }
+  },
+  "propConfig": {
+    "params.rowData": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 5,
+      "width": 210
+    },
+    "loading": {
+      "mode": "blocking"
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "UDT Indicator"
+        },
+        "position": {
+          "basis": "30px"
+        },
+        "propConfig": {
+          "meta.visible": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData"
+              },
+              "transforms": [
+                {
+                  "code": "\t# the \u0027udt\u0027 param denotes whether or not this alarm is defined in a\n\t# UDT defintion; if this alarm is a UDT alarm, then display this\n\t# circular icon (if icon is green, then alarm\u0027s props are different\n\t# than the def\u0027s alarm\u0027s props; if icon is grey, then alarm\u0027s props\n\t# are the same as the def\u0027s alarm\u0027s props)\n\t\n\treturn value[\u0027udt\u0027]",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.color": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData.color"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "path": "material/fiber_manual_record"
+        },
+        "type": "ia.display.icon"
+      },
+      {
+        "meta": {
+          "name": "Alarm Name"
+        },
+        "position": {
+          "basis": "50px",
+          "grow": 1
+        },
+        "propConfig": {
+          "props.style.color": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData.enabled"
+              },
+              "transforms": [
+                {
+                  "code": "\t# if the alarm is disabled, then return a lighter grey for the text color\n\t\n\tif str(value) \u003d\u003d \u0027True\u0027:\n\t\treturn \u0027--neutral-100\u0027\n\telse:\n\t\treturn \u0027--neutral-50\u0027",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.style.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData.fontSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData"
+              },
+              "transforms": [
+                {
+                  "code": "\t# returning the name of the alarm that was passed in as a param\n\t\n\treturn value[\u0027name\u0027]",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "fontFamily": "Helvetica",
+            "fontWeight": "bold"
+          }
+        },
+        "type": "ia.display.label"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "style": {
+        "backgroundColor": "--neutral-10"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "custom": {},
+  "params": {
+    "rowData": {
+      "adNames": [],
+      "bound": 1,
+      "enabled": 1,
+      "propName": {
+        "value": "value"
+      }
+    }
+  },
+  "propConfig": {
+    "params.rowData": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 24,
+      "width": 195
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Text Field"
+        },
+        "position": {
+          "basis": "100%",
+          "grow": 1
+        },
+        "propConfig": {
+          "props.enabled": {
+            "binding": {
+              "config": {
+                "expression": "toBoolean({view.params.rowData.enabled})"
+              },
+              "type": "expr"
+            }
+          },
+          "props.style.fontWeight": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData.bound"
+              },
+              "transforms": [
+                {
+                  "code": "\t# the \u0027bound\u0027 param denotes whether or not the associated data property has a binding; if\n\t# \u0027bound\u0027 is 1, meaning the property has a binding, then make the property name bold\n\t\n\tif value \u003d\u003d 1:\n\t\treturn \u0027bold\u0027\n\telse:\n\t\treturn \u0027normal\u0027",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "view.params.rowData"
+              },
+              "transforms": [
+                {
+                  "code": "\t# return the associated data property name that was passed in as a param\n\t\n\tself.props.text \u003d \u0027\u0027\n\tif value[\u0027propName\u0027][\u0027value\u0027] \u003d\u003d None:\n\t\treturn \u0027\u0027\n\telse:\n\t\treturn value[\u0027propName\u0027][\u0027value\u0027]",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            },
+            "onChange": {
+              "enabled": null,
+              "script": "\t# name of an associated data property changed\n\t\n\tnewName \u003d currentValue.value\n\toldName \u003d self.view.params.rowData.propName[\u0027value\u0027]\n\t\n\tif newName !\u003d oldName and str(origin) not in [\u0027Binding\u0027,\u0027Script\u0027]:\n\n\t\t# creating a list of names that are not allowed for associated data properties\n\t\tforbiddenNames \u003d [\u0027name\u0027,\u0027enabled\u0027,\u0027priority\u0027,\u0027timestampSource\u0027,\n\t\t\t\t\t\t\t\u0027label\u0027,\u0027displayPath\u0027,\u0027ackMode\u0027,\u0027notes\u0027,\u0027ackNotesReqd\u0027,\n\t\t\t\t\t\t\t\u0027shelvingAllowed\u0027,\u0027mode\u0027,\u0027setpointA\u0027,\u0027inclusiveA\u0027,\u0027anyChange\u0027,\n\t\t\t\t\t\t\t\u0027setpointB\u0027,\u0027inclusiveB\u0027,\u0027bitPosition\u0027,\u0027bitOnZero\u0027,\u0027isActive\u0027,\n\t\t\t\t\t\t\t\u0027deadband\u0027,\u0027deadbandMode\u0027,\u0027timeOnDelaySeconds\u0027,\u0027timeOffDelaySeconds\u0027,\n\t\t\t\t\t\t\t\u0027ackPipeline\u0027,\u0027activePipeline\u0027,\u0027clearPipeline\u0027,\u0027voip_customMessage\u0027,\n\t\t\t\t\t\t\t\u0027CustomEmailMessage\u0027,\u0027CustomEmailSubject\u0027,\u0027CustomSmsMessage\u0027,\u0027Name\u0027,\n\t\t\t\t\t\t\t\u0027Enabled\u0027,\u0027Priority\u0027,\u0027Timestamp Source\u0027,\u0027Label\u0027,\u0027Display Path\u0027,\u0027Ack Mode\u0027,\n\t\t\t\t\t\t\t\u0027Notes\u0027,\u0027Ack Notes Required\u0027,\u0027Shelving Allowed\u0027,\u0027Mode\u0027,\u0027Setpoint\u0027,\n\t\t\t\t\t\t\t\u0027Inclusive\u0027,\u0027Any Change\u0027,\u0027Deadband\u0027,\u0027Deadband Mode\u0027,\u0027Active delay (seconds)\u0027,\n\t\t\t\t\t\t\t\u0027Clear delay (seconds)\u0027,\u0027Low Setpoint\u0027,\u0027Low Inclusive\u0027,\u0027High Setpoint\u0027,\n\t\t\t\t\t\t\t\u0027High Inclusive\u0027,\u0027Any Change\u0027,\u0027Bit Position\u0027,\u0027On Zero\u0027,\u0027Is Active\u0027,\n\t\t\t\t\t\t\t\u0027Ack Pipeline\u0027,\u0027Active Pipeline\u0027,\u0027Clear Pipeline\u0027,\u0027Custom Message\u0027,\n\t\t\t\t\t\t\t\u0027Custom Subject\u0027,\u0027activeCondition\u0027]\n\t\t\n\t\t# also adding the names of the other associated data properties (for this \n\t\t# alarm) to the list\n\t\tfor associatedData in self.view.params.rowData.adNames:\n\t\t\tforbiddenNames.append(associatedData)\n\t\t\n\t\t# checking to see if the new name is in the list of forbidden names\n\t\tidx \u003d -1\n\t\tfor index,name in enumerate(forbiddenNames):\n\t\t\tif newName \u003d\u003d name:\n\t\t\t\tidx \u003d index\n\t\t\t\tbreak\n\t\t\n\t\t# if index is not -1 and the new name is not equal to the old name, then a\n\t\t# forbidden name was entered (notify the user via popup)\n\t\tif idx !\u003d -1 and newName !\u003d oldName:\n\t\t\t# forbidden names list has 60 names to start; if the idx var is greater\n\t\t\t# than 59, then we know that the alarm already has an associated data \n\t\t\t# with the same name\n\t\t\tif idx \u003e 59:\n\t\t\t\tbody \u003d \u0027This alarm already has an associated data called \u0027 + newName + \u0027. Please use a different name.\u0027\n\t\t\telse:\n\t\t\t\tbody \u003d newName + \u0027 is a reserved name. Please use a different name.\u0027\n\t\t\t\t\n\t\t\tsystem.perspective.openPopup(\"change-associated-data-name\",\u0027Exchange/Alarm Configurator/Framework/Popup\u0027, params \u003d {\u0027title\u0027:\u0027Error\u0027,\u0027body\u0027:body,\u0027id\u0027:\u0027change-associated-data-name\u0027},showCloseIcon\u003dFalse,draggable\u003dFalse,viewportBound\u003dTrue,overlayDismiss\u003dTrue,modal\u003dTrue)\n\t\t\tself.props.text \u003d oldName\n\t\t\n\t\t# non-forbidden name was entered, send a message to propChange containing the new name\t\n\t\telif newName !\u003d oldName:\n\t\t\tpayload \u003d {\u0027propName\u0027:oldName,\u0027propVal\u0027:newName,\u0027adNameChange\u0027:0}\n\t\t\t\n\t\t\tlogger \u003d system.util.getLogger(\u0027configurator.adnamecell\u0027)\n\t\t\tlogger.debug(\u0027associated data name changed; old name\u003d \u0027 + oldName + \u0027; new name\u003d \u0027 + newName)\n\t\t\t\n\t\t\tsystem.perspective.sendMessage(\"propChange\",payload\u003dpayload,scope\u003d\"page\")\n\t\t\n\t\t# removing focus from the text field\t\n\t\tself.parent.focus()"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "backgroundColor": "--neutral-10",
+            "borderStyle": "none",
+            "color": "--info",
+            "marginLeft": "8px",
+            "outlineStyle": "none"
+          }
+        },
+        "type": "ia.input.text-field"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "style": {
+        "outlineStyle": "none"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

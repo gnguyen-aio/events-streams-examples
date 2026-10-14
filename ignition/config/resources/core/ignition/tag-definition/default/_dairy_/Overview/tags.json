@@ -1,0 +1,34 @@
+[
+  {
+    "valueSource": "opc",
+    "opcItemPath": "ns\u003d1;s\u003d[dairy]Overview/RunControl",
+    "dataType": "Int2",
+    "name": "RunControl",
+    "tagType": "AtomicTag",
+    "opcServer": "Ignition OPC UA Server"
+  },
+  {
+    "valueSource": "opc",
+    "opcItemPath": "ns\u003d1;s\u003d[dairy]Overview/CurrentOrder",
+    "dataType": "Int2",
+    "name": "CurrentOrder",
+    "tagType": "AtomicTag",
+    "opcServer": "Ignition OPC UA Server"
+  },
+  {
+    "valueSource": "opc",
+    "opcItemPath": "ns\u003d1;s\u003d[dairy]Overview/CurrentRun",
+    "dataType": "Int2",
+    "name": "CurrentRun",
+    "tagType": "AtomicTag",
+    "opcServer": "Ignition OPC UA Server"
+  },
+  {
+    "valueSource": "opc",
+    "opcItemPath": "ns\u003d1;s\u003d[dairy]Overview/CaseCount",
+    "dataType": "Float8",
+    "name": "CaseCount",
+    "tagType": "AtomicTag",
+    "opcServer": "Ignition OPC UA Server"
+  }
+]

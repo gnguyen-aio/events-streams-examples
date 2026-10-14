@@ -1,0 +1,3503 @@
+{
+  "custom": {},
+  "params": {
+    "alarm": {},
+    "allAlarmNames": [],
+    "associatedDataMode": 0,
+    "enabledProps": [],
+    "udtAlarm": {}
+  },
+  "propConfig": {
+    "params.alarm": {
+      "onChange": {
+        "enabled": null,
+        "script": "\tdef containsAssociatedData(alarm):\n\t\t\"\"\"\n\t\tChecks to see if the alarm has any associated data properties, and if it\n\t\t\tdoes, creates list of the names of the associated data properties.\n\t\t\t\n\t\tArgs:\n\t\t\talarm: The alarm object being searched.\n\t\t\t\n\t\tReturns:\n\t\t\tA tuple in which the first element is False if the alarm does not\n\t\t\thave any associated data properties, or True if the alarm does\n\t\t\thave associated data prperties, and in which the second element\n\t\t\tis a list that is empty if the alarm does not have associated data \n\t\t\tproperties, or it contains the name of the associated data\n\t\t\tpropertie(s) (if the alarm has at least one).\n\t\t\"\"\"\n\t\tbuiltInProperties \u003d {\u0027name\u0027,\u0027enabled\u0027,\u0027priority\u0027,\u0027timestampSource\u0027,\n\t\t\t\t\t\t\t\t\u0027label\u0027,\u0027displayPath\u0027,\u0027ackMode\u0027,\u0027notes\u0027,\u0027ackNotesReqd\u0027,\n\t\t\t\t\t\t\t\t\u0027shelvingAllowed\u0027,\u0027mode\u0027,\u0027setpointA\u0027,\u0027inclusiveA\u0027,\u0027anyChange\u0027,\n\t\t\t\t\t\t\t\t\u0027setpointB\u0027,\u0027inclusiveB\u0027,\u0027bitPosition\u0027,\u0027bitOnZero\u0027,\u0027isActive\u0027,\n\t\t\t\t\t\t\t\t\u0027deadband\u0027,\u0027deadbandMode\u0027,\u0027timeOnDelaySeconds\u0027,\u0027timeOffDelaySeconds\u0027,\n\t\t\t\t\t\t\t\t\u0027ackPipeline\u0027,\u0027activePipeline\u0027,\u0027clearPipeline\u0027,\u0027voip_customMessage\u0027,\n\t\t\t\t\t\t\t\t\u0027CustomEmailMessage\u0027,\u0027CustomEmailSubject\u0027,\u0027CustomSmsMessage\u0027,\u0027activeCondition\u0027}\n\t\tif set(alarm.keys()).issubset(builtInProperties) \u003d\u003d True:\n\t\t\treturn (False,[])\n\t\telse:\n\t\t\t# return a list of associated data props\n\t\t\treturn (True,[prop for prop in alarm.keys() if prop not in builtInProperties]) \n\t\n\tdef atLeastOnePropEnabled(categoryProps):\n\t\t\"\"\"\n\t\tChecks to see if there is at least one property in \u0027categoryProps\u0027 (could\n\t\t\tbe Main properties, Alarm Mode properties, etc) that exists in the\n\t\t\t\u0027enabledProps\u0027 list. If there is at least one property from a category\n\t\t\tthat exists in the \u0027enabledProps\u0027 list, then that category will be\n\t\t\tvisible.\n\t\t\t\n\t\tArgs:\n\t\t\tcategoryProps: A list of properties that pertain to a specific\n\t\t\t\tcategory in the alarm editor (could be Deadbands and Time\n\t\t\t\tDelays, or Main, etc).\n\t\t\t\t\n\t\tReturns:\n\t\t\tTrue if at least one property in categoryProps exists in enabledProps,\n\t\t\tor False if there is not a property in categoryProps that exists in\n\t\t\tenabledProps.\n\t\t\"\"\"\n\t\tenabledProps \u003d self.params.enabledProps\n\t\t\n\t\tfor prop in categoryProps:\n\t\t\tif prop in enabledProps:\n\t\t\t\treturn True\n\t\t\n\t\treturn False\n\t\n\tdef expandAll(categories):\n\t\t\"\"\"\n\t\tExpands all of the visible categories (a category, like the Main alarm\n\t\t\tproperties, will be visible if at least one of the properties from that\n\t\t\tcategory is enabled).\n\t\t\t\n\t\tArgs:\n\t\t\tcategories: The categories that need to be expanded.\n\t\t\"\"\"\n\t\tenabledProps \u003d self.params.enabledProps\n\t\n\t\t# if previous alarm had associated data properties, then associated data \n\t\t# section was made visible; after associated data section was made visible \n\t\t# by previous alarm, user can select a different alarm for the same tag; \n\t\t# doing this will cause this expandAll function to execute again to make \n\t\t# sure that all categories are expanded after first selecting a tag; but, \n\t\t# if this second alarm does not have any associated data properties, then \n\t\t# we need to also make sure that associated data properties are not visible\n\t\t\n\t\tif self.getChild(\"root\").getChild(\"Content\").getChild(\"Associated Data Table\").position.display \u003d\u003d True and \u0027Associated Data\u0027 not in categories.keys():\n\t\t\tself.getChild(\"root\").getChild(\"Content\").getChild(\"Associated Data Table\").position.display \u003d False\n\t\t\n\t\tif len(enabledProps) \u003e 0:\n\t\t\t# if enabledProps is not empty, then need to decide which categories to \n\t\t\t# expand (only expand categories that have at least a single prop in the \n\t\t\t# enabledProps list)\n\t\t\tfor category in categories:\n\t\t\t\tcategoryProps \u003d categories[category]\n\t\t\t\t# need to check to see if there is at least one enabled prop in the\n\t\t\t\t# category, and if there is, then expand the category\n\t\t\t\tif atLeastOnePropEnabled(categoryProps) or (category \u003d\u003d \u0027Associated Data\u0027 and self.params.associatedDataMode in [\u0027ViewEdit\u0027,\u0027ViewOnly\u0027]):\n\t\t\t\t\tself.getChild(\"root\").getChild(\"Content\").getChild(category+\" Top Bar\").getChild(\"Expand Or Collapse\").props.path \u003d \u0027material/expand_less\u0027\n\t\t\t\t\tself.getChild(\"root\").getChild(\"Content\").getChild(category+\" Table\").position.display \u003d True\n\t\telse:\n\t\t\t# if enabledProps is empty, then assume that all categories need to be expanded\n\t\t\tfor category in categories:\n\t\t\t\tself.getChild(\"root\").getChild(\"Content\").getChild(category+\" Top Bar\").getChild(\"Expand Or Collapse\").props.path \u003d \u0027material/expand_less\u0027\n\t\t\t\tself.getChild(\"root\").getChild(\"Content\").getChild(category+\" Table\").position.display \u003d True\n\t\t\t\n\tdef collapseAll(categories):\n\t\t\"\"\"\n\t\tCollapses all of the visible categories (a category, like the Main alarm\n\t\t\tproperties, will be visible if at least one of the properties from that\n\t\t\tcategory is enabled).\n\t\t\t\n\t\tArgs:\n\t\t\tcategories: The categories that need to be collapsed.\n\t\t\"\"\"\n\t\tenabledProps \u003d self.params.enabledProps\n\t\t\n\t\t# if associatedData was made visible by previous alarm, if collapseAll is\n\t\t# called, and if the currentValue of this \u0027alarm\u0027 param is empty (no alarm \n\t\t# selected) or does not contain an associated data property, then we need \n\t\t# to make sure to hide the associated data properties\n\t\tif self.getChild(\"root\").getChild(\"Content\").getChild(\"Associated Data Table\").position.display \u003d\u003d True and \u0027Associated Data\u0027 not in categories.keys():\n\t\t\tself.getChild(\"root\").getChild(\"Content\").getChild(\"Associated Data Table\").position.display \u003d False\n\t\t\n\t\tif len(enabledProps) \u003e 0:\n\t\t\t# if enabledProps is not empty, then need to decide which categories to \n\t\t\t# collapse (only collapse categories that have at least a single prop \n\t\t\t# in the enabledProps list)\n\t\t\tfor category in categories:\n\t\t\t\tcategoryProps \u003d categories[category]\n\t\t\t\t# need to check to see if there is at least one enabled prop in the\n\t\t\t\t# category, and if there is, then collapse the category\n\t\t\t\tif atLeastOnePropEnabled(categoryProps) or (category \u003d\u003d \u0027Associated Data\u0027 and self.params.associatedDataMode in [\u0027ViewEdit\u0027,\u0027ViewOnly\u0027]):\n\t\t\t\t\tself.getChild(\"root\").getChild(\"Content\").getChild(category+\" Top Bar\").getChild(\"Expand Or Collapse\").props.path \u003d \u0027material/expand_more\u0027\n\t\t\t\t\tself.getChild(\"root\").getChild(\"Content\").getChild(category+\" Table\").position.display \u003d False\n\t\telse:\n\t\t\t# if enabledProps is empty, then assume that all categories need to be collapsed\n\t\t\tfor category in categories:\n\t\t\t\tself.getChild(\"root\").getChild(\"Content\").getChild(category+\" Top Bar\").getChild(\"Expand Or Collapse\").props.path \u003d \u0027material/expand_more\u0027\n\t\t\t\tself.getChild(\"root\").getChild(\"Content\").getChild(category+\" Table\").position.display \u003d False\n\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\t\n\t# initializing a dict to hold the section names along with the properties in each section\n\tcategories \u003d ({\u0027Main\u0027:[\u0027name\u0027,\u0027enabled\u0027,\u0027priority\u0027,\u0027timestampSource\u0027,\u0027label\u0027,\u0027displayPath\u0027,\u0027ackMode\u0027,\u0027notes\u0027,\u0027ackNotesReqd\u0027,\u0027shelvingAllowed\u0027],\n\t\u0027Alarm Mode Settings\u0027:[\u0027mode\u0027,\u0027setpointA\u0027,\u0027inclusiveA\u0027,\u0027anyChange\u0027,\u0027setpointB\u0027,\u0027inclusiveB\u0027,\u0027bitPosition\u0027,\u0027bitOnZero\u0027,\u0027isActive\u0027,\u0027activeCondition\u0027],\n\t\u0027Deadbands And Time Delays\u0027:[\u0027deadband\u0027,\u0027deadbandMode\u0027,\u0027timeOnDelaySeconds\u0027,\u0027timeOffDelaySeconds\u0027]})\n\t\n\t# if true, then also include these additional sections (if system.roster exists, then \n\t# assume that following modules are installed: Alarm Notification, SMS Notification, \n\t# and Voice Notification)\t\t\t\n\tif hasattr(system, \"roster\"):\n\t\tcategories[\u0027Notification\u0027] \u003d [\u0027ackPipeline\u0027,\u0027activePipeline\u0027,\u0027clearPipeline\u0027]\n\t\tcategories[\u0027Phone Call Settings\u0027] \u003d [\u0027voip_customMessage\u0027]\n\t\tcategories[\u0027Email Notification Properties\u0027] \u003d [\u0027CustomEmailMessage\u0027,\u0027CustomEmailSubject\u0027]\n\t\tcategories[\u0027Sms Notification Properties\u0027] \u003d [\u0027CustomSmsMessage\u0027]\n\t\n\tif currentValue.value.size() \u003e 0:\n\t\t# like the built-in alarm editor: when an alarm is first selected, expand the sections \n\t\t# of the property editor; if the user manually collapses some sections, and if the \n\t\t# user then selects a different alarm or changes the name of the current alarm, then \n\t\t# expand all of the sections again\n\t\n\t\t# check to see if alarm has associated data, and if it does, get a list of associated \n\t\t# data props\n\t\tcontainsAssociatedDataReturn \u003d containsAssociatedData(currentValue.value)\n\t\tif containsAssociatedDataReturn[0] \u003d\u003d True:\n\t\t\t# if associatedDataMode is \u0027ViewEdit\u0027, then the user has the ability\n\t\t\t# to add associated data properties; otherwise, the user does not have\n\t\t\t# the ability to add associated data properties\n\t\t\tassociatedDataMode \u003d self.params.associatedDataMode\n\t\t\t\n\t\t\tif associatedDataMode in [\u0027ViewEdit\u0027,\u0027ViewOnly\u0027]:\n\t\t\t\tcategories[\u0027Associated Data\u0027] \u003d containsAssociatedDataReturn[1]\n\t\t\n\t\tif previousValue \u003d\u003d None:\n\t\t\tlogger.debug(\u0027current alarm object not empty and previous alarm object null, expand the sections\u0027)\n\t\t\texpandAll(categories)\n\t\telse:\n\t\t\tif previousValue.value.size() \u003d\u003d 0:\n\t\t\t\tlogger.debug(\u0027current alarm object not empty and previous alarm object empty, expand the sections\u0027)\n\t\t\t\texpandAll(categories)\n\t\t\telse:\n\t\t\t\tprevAlarmName \u003d previousValue.value[\u0027name\u0027].value\n\t\t\t\tcurrAlarmName \u003d currentValue.value[\u0027name\u0027].value\n\t\t\t\t\n\t\t\t\t# like built-in alarm editor, if alarm name changes (whether a different alarm \n\t\t\t\t# was selected or the name of current alarm changed), then expand the sections\n\t\t\t\tif prevAlarmName !\u003d currAlarmName:\n\t\t\t\t\tlogger.debug(\u0027prev alarm name not equal to curr alarm name, expand sections; prev name\u003d \u0027 + prevAlarmName + \u0027; curr name\u003d \u0027 + currAlarmName)\n\t\t\t\t\texpandAll(categories)\n\t\t\t\t\t\n\t\t\t\t# if associated data was added to an alarm that did not already have associated \n\t\t\t\t# data, then that would have made the associated data table visible in the \n\t\t\t\t# session; then, if this same associated data prop is then deleted from the \n\t\t\t\t# same alarm such that this alarm no longer has any associated data, then we \n\t\t\t\t# need to hide the associated data table\n\t\t\t\tif self.getChild(\"root\").getChild(\"Content\").getChild(\"Associated Data Table\").position.display \u003d\u003d True and \u0027Associated Data\u0027 not in categories.keys():\n\t\t\t\t\tself.getChild(\"root\").getChild(\"Content\").getChild(\"Associated Data Table\").position.display \u003d False\n\t\t\t\t\n\telse:\n\t\tlogger.debug(\u0027current alarm object is empty, collapse the sections\u0027)\n\t\tcollapseAll(categories)"
+      },
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.allAlarmNames": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.associatedDataMode": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.enabledProps": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.udtAlarm": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 794
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Alarm Name"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "view.params.alarm"
+              },
+              "transforms": [
+                {
+                  "code": "\t# return alarm name if alarm is selected\n\t\n\tif \u0027name\u0027 not in value.keys():\n\t\treturn \u0027No alarm selected\u0027\n\telse:\n\t\treturn value[\u0027name\u0027]",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "color": "--neutral-100",
+            "fontWeight": "bold"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "events": {
+                  "dom": {
+                    "onClick": {
+                      "config": {
+                        "script": "\tdef atLeastOnePropEnabled(categoryProps):\n\t\t\"\"\"\n\t\tChecks to see if there is at least one property in \u0027categoryProps\u0027 (could\n\t\t\tbe Main properties, Alarm Mode properties, etc) that exists in the\n\t\t\t\u0027enabledProps\u0027 list. If there is at least one property from a category\n\t\t\tthat exists in the \u0027enabledProps\u0027 list, then that category will be\n\t\t\tvisible.\n\t\t\t\n\t\tArgs:\n\t\t\tcategoryProps: A list of properties that pertain to a specific\n\t\t\t\tcategory in the alarm editor (could be Deadbands and Time\n\t\t\t\tDelays, or Main, etc).\n\t\t\t\t\n\t\tReturns:\n\t\t\tTrue if at least one property in categoryProps exists in enabledProps,\n\t\t\tor False if there is not a property in categoryProps that exists in\n\t\t\tenabledProps.\n\t\t\"\"\"\n\t\tenabledProps \u003d self.view.params.enabledProps\n\t\t\n\t\tfor prop in categoryProps:\n\t\t\tif prop in enabledProps:\n\t\t\t\treturn True\n\t\t\n\t\treturn False\n\t\n\t\n\t# expand all of the sections\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\tlogger.debug(\u0027sections manually expanded\u0027)\n\t\n\t# only expand sections that contain at least one property in enabledProps \n\t# (unless enabledProps is empty)\n\tenabledProps \u003d self.view.params.enabledProps\n\t\n\t# initializing a dict to hold the section names along with the properties \n\t# in each section\n\tcategories \u003d ({\u0027Main\u0027:[\u0027name\u0027,\u0027enabled\u0027,\u0027priority\u0027,\u0027timestampSource\u0027,\u0027label\u0027,\u0027displayPath\u0027,\u0027ackMode\u0027,\u0027notes\u0027,\u0027ackNotesReqd\u0027,\u0027shelvingAllowed\u0027],\n\t\u0027Alarm Mode Settings\u0027:[\u0027mode\u0027,\u0027setpointA\u0027,\u0027inclusiveA\u0027,\u0027anyChange\u0027,\u0027setpointB\u0027,\u0027inclusiveB\u0027,\u0027bitPosition\u0027,\u0027bitOnZero\u0027,\u0027isActive\u0027,\u0027activeCondition\u0027],\n\t\u0027Deadbands And Time Delays\u0027:[\u0027deadband\u0027,\u0027deadbandMode\u0027,\u0027timeOnDelaySeconds\u0027,\u0027timeOffDelaySeconds\u0027]})\n\t\n\t# if true, then also include these additional sections (if system.roster \n\t# exists, then assume that following modules are installed: Alarm\n\t# Notification, SMS Notification, and Voice Notification)\t\t\n\tif hasattr(system, \"roster\"):\n\t\tcategories[\u0027Notification\u0027] \u003d [\u0027ackPipeline\u0027,\u0027activePipeline\u0027,\u0027clearPipeline\u0027]\n\t\tcategories[\u0027Phone Call Settings\u0027] \u003d [\u0027voip_customMessage\u0027]\n\t\tcategories[\u0027Email Notification Properties\u0027] \u003d [\u0027CustomEmailMessage\u0027,\u0027CustomEmailSubject\u0027]\n\t\tcategories[\u0027Sms Notification Properties\u0027] \u003d [\u0027CustomSmsMessage\u0027]\n\t\n\t# if associatedDataMode is \u0027ViewEdit\u0027, then the user has the ability\n\t# to add associated data properties; otherwise, the user does not have\n\t# the ability to add associated data properties\n\tassociatedDataMode \u003d self.view.params.associatedDataMode\n\n\tif associatedDataMode in [\u0027ViewEdit\u0027,\u0027ViewOnly\u0027]:\t\n\t\t# if associatedDataTopBar is displayed, then there is at least one \n\t\t# associated data property in this alarm, so add the section\n\t\tif self.parent.parent.parent.getChild(\"Content\").getChild(\"Associated Data Top Bar\").position.display \u003d\u003d True:\n\t\t\tcategories[\u0027Associated Data\u0027] \u003d []\n\t\n\tif len(enabledProps) \u003e 0:\n\t\t# if enabledProps is not empty, then need to decide which categories \n\t\t# to expand (only expand categories that have at least a single prop \n\t\t# in the enabledProps list)\n\t\tfor category in categories:\n\t\t\tcategoryProps \u003d categories[category]\n\t\t\t# need to check to see if there is at least one enabled prop in \n\t\t\t# the category, and if there is, then expand the category\n\t\t\tif atLeastOnePropEnabled(categoryProps) or (category \u003d\u003d \u0027Associated Data\u0027 and self.view.params.associatedDataMode in [\u0027ViewEdit\u0027,\u0027ViewOnly\u0027]):\n\t\t\t\tself.parent.parent.parent.getChild(\"Content\").getChild(category+\" Top Bar\").getChild(\"Expand Or Collapse\").props.path \u003d \u0027material/expand_less\u0027\n\t\t\t\tself.parent.parent.parent.getChild(\"Content\").getChild(category+\" Table\").position.display \u003d True\n\telse:\n\t\t# if enabledProps is empty, then assume that all categories need to be expanded\n\t\tfor category in categories:\n\t\t\tself.parent.parent.parent.getChild(\"Content\").getChild(category+\" Top Bar\").getChild(\"Expand Or Collapse\").props.path \u003d \u0027material/expand_less\u0027\n\t\t\tself.parent.parent.parent.getChild(\"Content\").getChild(category+\" Table\").position.display \u003d True\n"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Expand"
+                },
+                "position": {
+                  "basis": "30px"
+                },
+                "props": {
+                  "color": "--neutral-100",
+                  "path": "material/expand_more",
+                  "style": {
+                    "classes": "exchange/alarm-configurator/icon"
+                  }
+                },
+                "type": "ia.display.icon"
+              },
+              {
+                "events": {
+                  "dom": {
+                    "onClick": {
+                      "config": {
+                        "script": "\tdef atLeastOnePropEnabled(categoryProps):\n\t\t\"\"\"\n\t\tChecks to see if there is at least one property in \u0027categoryProps\u0027 (could\n\t\t\tbe Main properties, Alarm Mode properties, etc) that exists in the\n\t\t\t\u0027enabledProps\u0027 list. If there is at least one property from a category\n\t\t\tthat exists in the \u0027enabledProps\u0027 list, then that category will be\n\t\t\tvisible.\n\t\t\t\n\t\tArgs:\n\t\t\tcategoryProps: A list of properties that pertain to a specific\n\t\t\t\tcategory in the alarm editor (could be Deadbands and Time\n\t\t\t\tDelays, or Main, etc).\n\t\t\t\t\n\t\tReturns:\n\t\t\tTrue if at least one property in categoryProps exists in enabledProps,\n\t\t\tor False if there is not a property in categoryProps that exists in\n\t\t\tenabledProps.\n\t\t\"\"\"\n\t\tenabledProps \u003d self.view.params.enabledProps\n\t\t\n\t\tfor prop in categoryProps:\n\t\t\tif prop in enabledProps:\n\t\t\t\treturn True\n\t\t\n\t\treturn False\n\t\n\t# collapse all of the sections\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\tlogger.debug(\u0027sections manually collapsed\u0027)\n\t\n\t# only collapse sections that contain at least one property in enabledProps\n\t# (unless enabledProps is empty)\n\tenabledProps \u003d self.view.params.enabledProps\n\t\n\t# initializing a dict to hold the section names along with the properties \n\t# in each section\n\tcategories \u003d ({\u0027Main\u0027:[\u0027name\u0027,\u0027enabled\u0027,\u0027priority\u0027,\u0027timestampSource\u0027,\u0027label\u0027,\u0027displayPath\u0027,\u0027ackMode\u0027,\u0027notes\u0027,\u0027ackNotesReqd\u0027,\u0027shelvingAllowed\u0027],\n\t\u0027Alarm Mode Settings\u0027:[\u0027mode\u0027,\u0027setpointA\u0027,\u0027inclusiveA\u0027,\u0027anyChange\u0027,\u0027setpointB\u0027,\u0027inclusiveB\u0027,\u0027bitPosition\u0027,\u0027bitOnZero\u0027,\u0027isActive\u0027,\u0027activeCondition\u0027],\n\t\u0027Deadbands And Time Delays\u0027:[\u0027deadband\u0027,\u0027deadbandMode\u0027,\u0027timeOnDelaySeconds\u0027,\u0027timeOffDelaySeconds\u0027]})\n\t\n\t# if true, then also include these additional sections (if system.roster\n\t# exists, then assume that following modules are installed: Alarm \n\t# Notification, SMS Notification, and Voice Notification)\t\t\t\n\tif hasattr(system, \"roster\"):\n\t\tcategories[\u0027Notification\u0027] \u003d [\u0027ackPipeline\u0027,\u0027activePipeline\u0027,\u0027clearPipeline\u0027]\n\t\tcategories[\u0027Phone Call Settings\u0027] \u003d [\u0027voip_customMessage\u0027]\n\t\tcategories[\u0027Email Notification Properties\u0027] \u003d [\u0027CustomEmailMessage\u0027,\u0027CustomEmailSubject\u0027]\n\t\tcategories[\u0027Sms Notification Properties\u0027] \u003d [\u0027CustomSmsMessage\u0027]\n\t\n\t# if associatedDataMode is \u0027ViewEdit\u0027, then the user has the ability\n\t# to add associated data properties; otherwise, the user does not have\n\t# the ability to add associated data properties\n\tassociatedDataMode \u003d self.view.params.associatedDataMode\n\n\tif associatedDataMode in [\u0027ViewEdit\u0027,\u0027ViewOnly\u0027]:\t\n\t\t# if associatedDataTopBar is displayed, then there is at least one \n\t\t# associated data property in this alarm, so add the section\n\t\tif self.parent.parent.parent.getChild(\"Content\").getChild(\"Associated Data Top Bar\").position.display \u003d\u003d True:\n\t\t\tcategories[\u0027Associated Data\u0027] \u003d []\n\t\n\tif len(enabledProps) \u003e 0:\n\t\t# if enabledProps is not empty, then need to decide which categories to collapse (only collapse categories that have at least\n\t\t# a single prop in the enabledProps list)\n\t\tfor category in categories:\n\t\t\tcategoryProps \u003d categories[category]\n\t\t\t# need to check to see if there is at least one enabled prop in the\n\t\t\t# category, and if there is, then collapse the category\n\t\t\tif atLeastOnePropEnabled(categoryProps) or (category \u003d\u003d \u0027Associated Data\u0027 and self.view.params.associatedDataMode in [\u0027ViewEdit\u0027,\u0027ViewOnly\u0027]):\n\t\t\t\tself.parent.parent.parent.getChild(\"Content\").getChild(category+\" Top Bar\").getChild(\"Expand Or Collapse\").props.path \u003d \u0027material/expand_more\u0027\n\t\t\t\tself.parent.parent.parent.getChild(\"Content\").getChild(category+\" Table\").position.display \u003d False\n\telse:\n\t\t# if enabledProps is empty, then assume that all categories need to be collapsed\n\t\tfor category in categories:\n\t\t\tself.parent.parent.parent.getChild(\"Content\").getChild(category+\" Top Bar\").getChild(\"Expand Or Collapse\").props.path \u003d \u0027material/expand_more\u0027\n\t\t\tself.parent.parent.parent.getChild(\"Content\").getChild(category+\" Table\").position.display \u003d False"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Collapse"
+                },
+                "position": {
+                  "basis": "30px"
+                },
+                "props": {
+                  "color": "--neutral-100",
+                  "path": "material/expand_less",
+                  "style": {
+                    "classes": "exchange/alarm-configurator/icon"
+                  }
+                },
+                "type": "ia.display.icon"
+              },
+              {
+                "events": {
+                  "dom": {
+                    "onClick": {
+                      "config": {
+                        "script": "\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\tlogger.debug(\u0027add associated data pressed\u0027)\n\t\n\t# default the name of new associated data property to \u0027New Data\u0027\n\tif \u0027New Data\u0027 not in self.view.params.alarm.keys():\n\t\tpropName \u003d \u0027New Data\u0027\n\telse:\n\t\t# if there is already an associated data property called \u0027New Data\u0027, then\n\t\t# keep appending a number at the end of \u0027New Data\u0027 until we have a unique\n\t\t# name\n\t\tfoundValidName \u003d 0\n\t\tx \u003d 1\n\t\twhile foundValidName \u003d\u003d 0:\n\t\t\tpropName \u003d \u0027New Data \u0027 + str(x)\n\t\t\tif propName not in self.view.params.alarm.keys():\n\t\t\t\tfoundValidName \u003d 1\n\t\t\tx \u003d x + 1\n\t\n\t# send the prop name and the empty string for propVal (initializing the\n\t# new property to the empty string) to propChange\n\tpayload \u003d {\u0027propName\u0027:propName,\u0027propVal\u0027:\u0027\u0027}\n\tsystem.perspective.sendMessage(\"propChange\",payload\u003dpayload,scope\u003d\"page\")\n\t\n\t# if the associated data table is not being displayed because the user chose \n\t# to collapse it, then we need to open it here\n\tif self.parent.parent.parent.getChild(\"Content\").getChild(\"Associated Data Table\").position.display \u003d\u003d False:\n\t\tself.parent.parent.parent.getChild(\"Content\").getChild(\"Associated Data Table\").position.display \u003d True\n\t\tself.parent.parent.parent.getChild(\"Content\").getChild(\"Associated Data Top Bar\").getChild(\"Expand Or Collapse\").props.path \u003d \u0027material/expand_less\u0027"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Add Associated Data"
+                },
+                "position": {
+                  "basis": "30px"
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "associatedDataMode": "{view.params.associatedDataMode}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# if associatedDataMode is \u0027ViewEdit\u0027, then the user has the ability\n\t# to add associated data properties; otherwise, the user does not have\n\t# the ability to add associated data properties\n\t\n\tif value[\u0027associatedDataMode\u0027] \u003d\u003d \u0027ViewEdit\u0027:\n\t\treturn True\n\telse:\n\t\treturn False",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  }
+                },
+                "props": {
+                  "color": "--neutral-100",
+                  "path": "material/add",
+                  "style": {
+                    "classes": "exchange/alarm-configurator/icon"
+                  }
+                },
+                "type": "ia.display.icon"
+              },
+              {
+                "events": {
+                  "dom": {
+                    "onClick": {
+                      "config": {
+                        "script": "\t# if associatedDataTopBar is displayed, then there is at least one associated\n\t# data property for this alarm\n\t\n\tif self.parent.parent.parent.getChild(\"Content\").getChild(\"Associated Data Top Bar\").position.display \u003d\u003d True:\n\t\tselectedRow \u003d self.parent.parent.parent.getChild(\"Content\").getChild(\"Associated Data Table\").props.selection.selectedRow\n\t\tif selectedRow !\u003d None:\n\t\t\t# get prop name and pass it to propChange (along with \u0027delete\u0027 flag \n\t\t\t# signaling that the property is being removed)\n\t\t\tpropName \u003d self.parent.parent.parent.getChild(\"Content\").getChild(\"Associated Data Table\").props.data[selectedRow][\u0027propName\u0027][\u0027value\u0027]\n\t\t\tpayload \u003d {\u0027propName\u0027:propName,\u0027propVal\u0027:\u0027\u0027, \u0027delete\u0027:1}\n\t\t\tsystem.perspective.sendMessage(\"propChange\",payload\u003dpayload,scope\u003d\"page\")\n\t\t\t\n\t\t\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\t\t\tlogger.debug(\u0027remove associated data pressed; propname\u003d \u0027 + str(propName))\n\t\t\t\n\t\t\tif self.parent.parent.parent.getChild(\"Content\").getChild(\"Associated Data Table\").props.selection.selectedRow !\u003d None:\n\t\t\t\tself.parent.parent.parent.getChild(\"Content\").getChild(\"Associated Data Table\").props.selection.selectedRow \u003d None"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Delete Associated Data"
+                },
+                "position": {
+                  "basis": "25px"
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "associatedDataMode": "{view.params.associatedDataMode}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# if associatedDataMode is \u0027ViewEdit\u0027, then the user has the ability\n\t# to add associated data properties; otherwise, the user does not have\n\t# the ability to add associated data properties\n\t\n\tif value[\u0027associatedDataMode\u0027] \u003d\u003d \u0027ViewEdit\u0027:\n\t\treturn True\n\telse:\n\t\treturn False",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  },
+                  "props.color": {
+                    "binding": {
+                      "config": {
+                        "expression": "if(toInt({..../Content/Associated Data Table.props.selection.selectedRow},-1)!\u003d-1,\u0027--neutral-100\u0027,\u0027--neutral-30\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.style.cursor": {
+                    "binding": {
+                      "config": {
+                        "expression": "if(toInt({..../Content/Associated Data Table.props.selection.selectedRow},-1)!\u003d-1,\u0027pointer\u0027,\u0027not-allowed\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "path": "material/delete"
+                },
+                "type": "ia.display.icon"
+              }
+            ],
+            "meta": {
+              "name": "Buttons"
+            },
+            "position": {
+              "basis": "200px",
+              "grow": 1
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Overridden Icon"
+                },
+                "position": {
+                  "basis": "18px"
+                },
+                "propConfig": {
+                  "props.color": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.alarm"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# if we have a UDT alarm instance and the alarm properties are the same\n\t# as the UDT alarm definition, return grey; otherwise, return green\n\t\n\tudtAlarm \u003d dict(self.view.params.udtAlarm.items())\n\talarm \u003d dict(value.items())\n\t\n\tif set(udtAlarm.keys())\u003d\u003dset(alarm.keys()) and set(udtAlarm.values())\u003d\u003dset(alarm.values()):\n\t\treturn \u0027--neutral-40\u0027\n\telse:\n\t\treturn \u0027--indicator\u0027",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "path": "material/fiber_manual_record"
+                },
+                "type": "ia.display.icon"
+              },
+              {
+                "meta": {
+                  "name": "Overridden Label"
+                },
+                "position": {
+                  "basis": "80px"
+                },
+                "props": {
+                  "text": "Overridden"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t# if color of overriddenIcon is set to \u0027--indicator\u0027, then we have a UDT\n\t# alarm instance where the properties of the UDT alarm instance are \n\t# different than the properties of the alarm in the UDT definition; the \n\t# user can click this container to make the properties of the UDT alarm \n\t# instance equal to the properties of the UDT alarm definition)\n\t\n\tif self.getChild(\"Overridden Icon\").props.color \u003d\u003d \u0027--indicator\u0027:\n\t\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\t\tlogger.debug(\u0027overridden UDT pressed; udt alarm\u003d \u0027 + str(self.view.params.udtAlarm[\u0027name\u0027]))\n\t\t\n\t\t# get the properties of the UDT alarm definition and send it to \n\t\t# overriddenUDT (makes the current alarm object equal to the \n\t\t# udtAlarm object)\n\t\tudtAlarm \u003d self.view.params.udtAlarm \n\t\tpayload \u003d {\u0027udtAlarm\u0027:udtAlarm}\n\t\tsystem.perspective.sendMessage(\"overriddenUdt\",payload\u003dpayload,scope\u003d\"page\")"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Overridden"
+            },
+            "position": {
+              "basis": "100px"
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.alarm"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# if \u0027udtAlarm\u0027 param is empty, then this is not a UDT alarm instance (don\u0027t display this container)\n\t\n\tif len(self.view.params.udtAlarm.keys()) \u003d\u003d 0:\n\t\treturn False\n\telse:\n\t\treturn True",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.classes": {
+                "binding": {
+                  "config": {
+                    "path": "./Overridden Icon.props.color"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# if color of overriddenIcon is set to \u0027--indicator\u0027, then we have a UDT alarm instance\n\t# where the properties of the UDT alarm instance are different than the properties of\n\t# the alarm in the UDT definition; if this is true, return the \u0027alarm-configurator/icon\u0027\n\t# style class, which changes the cursor to \u0027pointer\u0027 when the user hovers the mouse over\n\t# this container (signaling to the user that they can click on this to make the properties\n\t# of the UDT alarm instance equal to the properties of the UDT alarm definition)\n\t\n\tif value\u003d\u003d\u0027--indicator\u0027:\n\t\treturn \u0027alarm-configurator/icon\u0027\n\telse:\n\t\treturn \u0027\u0027",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "justify": "flex-end",
+              "style": {
+                "fontFamily": "Helvetica",
+                "fontSize": 15
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "Buttons And Overridden"
+        },
+        "position": {
+          "basis": "30px"
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "path": "view.params.alarm"
+              },
+              "transforms": [
+                {
+                  "code": "\t# if \u0027alarm\u0027 param is empty, no alarm selected (don\u0027t display buttons and overridden info)\n\t\n\tif len(value.items()) \u003d\u003d 0:\n\t\treturn False\n\telse:\n\t\treturn True",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Expand Or Collapse"
+                },
+                "position": {
+                  "basis": "25px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.path": {
+                    "binding": {
+                      "config": {
+                        "expression": "if({.../Main Table.position.display}\u003dTrue,\u0027material/expand_more\u0027,\u0027material/expand_less\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "type": "ia.display.icon"
+              },
+              {
+                "meta": {
+                  "name": "Title"
+                },
+                "position": {
+                  "basis": "96%"
+                },
+                "props": {
+                  "text": "Main"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t# if Main section is expanded, collapse it; otherwise, expand it\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\tlogger.debug(\u0027main section manually \u0027 + (\u0027expanded\u0027 if self.getSibling(\"Main Table\").position.display \u003d\u003d False else \u0027closed\u0027))\n\t\n\tself.getSibling(\"Main Table\").position.display \u003d not (self.getSibling(\"Main Table\").position.display)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Main Top Bar"
+            },
+            "position": {
+              "basis": "35px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "mainProps": "{../Main Table.props.data}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# if \u0027alarm\u0027 param is empty (no alarm selected), don\u0027t display this\n\t\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tif len(currAlarm.items()) \u003d\u003d 0:\n\t\treturn False\n\telse:\n\t\t# if enabledProps does not contain any main alarm props, then main table will not\n\t\t# have any configurable properties; in this case, do not display top bar\n\t\tmainProps \u003d value[\u0027mainProps\u0027]\n\t\t\n\t\t# have at least one main prop enabled\n\t\tif len(mainProps) \u003e 0:\n\t\t\treturn True\n\t\telse:\n\t\t\treturn False",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/alarm-configurator/framework/alarm-properties/property-section",
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "custom": {
+              "startingData": [
+                {
+                  "bindable": 0,
+                  "default": "Alarm",
+                  "dropdown": 0,
+                  "enabled": "True",
+                  "propName": "Name",
+                  "underlyingName": "name",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "True",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "True",
+                      "value": 0
+                    },
+                    {
+                      "label": "False",
+                      "value": 1
+                    }
+                  ],
+                  "propName": "Enabled",
+                  "underlyingName": "enabled",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "Low",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "Diagnostic",
+                      "value": 0
+                    },
+                    {
+                      "label": "Low",
+                      "value": 1
+                    },
+                    {
+                      "label": "Medium",
+                      "value": 2
+                    },
+                    {
+                      "label": "High",
+                      "value": 3
+                    },
+                    {
+                      "label": "Critical",
+                      "value": 4
+                    }
+                  ],
+                  "propName": "Priority",
+                  "underlyingName": "priority",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "System",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "System",
+                      "value": 0
+                    },
+                    {
+                      "label": "Value",
+                      "value": 1
+                    }
+                  ],
+                  "propName": "Timestamp Source",
+                  "underlyingName": "timestampSource",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": null,
+                  "dropdown": 0,
+                  "propName": "Label",
+                  "underlyingName": "label",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": null,
+                  "dropdown": 0,
+                  "propName": "Display Path",
+                  "underlyingName": "displayPath",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "Manual",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "Unused",
+                      "value": 0
+                    },
+                    {
+                      "label": "Auto",
+                      "value": 1
+                    },
+                    {
+                      "label": "Manual",
+                      "value": 2
+                    }
+                  ],
+                  "propName": "Ack Mode",
+                  "underlyingName": "ackMode",
+                  "value": ""
+                },
+                {
+                  "bindable": 0,
+                  "default": "",
+                  "dropdown": 0,
+                  "propName": "Notes",
+                  "underlyingName": "notes",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "False",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "True",
+                      "value": 0
+                    },
+                    {
+                      "label": "False",
+                      "value": 1
+                    }
+                  ],
+                  "propName": "Ack Notes Required",
+                  "underlyingName": "ackNotesReqd",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "True",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "True",
+                      "value": 0
+                    },
+                    {
+                      "label": "False",
+                      "value": 1
+                    }
+                  ],
+                  "propName": "Shelving Allowed",
+                  "underlyingName": "shelvingAllowed",
+                  "value": ""
+                }
+              ]
+            },
+            "meta": {
+              "name": "Main Table"
+            },
+            "position": {
+              "display": false,
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.startingData[0].existingAlarmNames": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.allAlarmNames"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.data": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "enabledProps": "{view.params.enabledProps}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# get the startingData; for each property in this section, startingData contains\n\t# the display name (ex: Display Path), the underlying name (ex: displayPath), a \n\t# flag denoting whether this property is listable or not, and other pieces of info\n\t\n\t# also, utilize enabledProps list to determine which properties should be enabled\n\t\n\tenabledProps \u003d value[\u0027enabledProps\u0027]\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tdata \u003d self.custom.startingData\n\ttableData \u003d []\n\t\n\tpropBindingClass \u003d \"\u003ctype \u0027com.inductiveautomation.perspective.gateway.script.DotReferenceJythonMap\u0027\u003e\"\n\t\n\tfor startingRow in data:\n\t\trow \u003d dict(startingRow)\n\t\tunderlyingName \u003d row[\u0027underlyingName\u0027]\n\t\t\n\t\t# only display this property in the table if it is enabled or if the \n\t\t# enabledProps is empty (in that case, show all props)\n\t\tif underlyingName in enabledProps or len(enabledProps) \u003d\u003d 0:\n\t\t\tpropName \u003d row[\u0027propName\u0027]\n\t\t\t\n\t\t\t# if the underlying name of the property does not exist in the \u0027alarm\u0027 object, \n\t\t\t# then this property must be set to the default value\n\t\t\tif underlyingName not in currAlarm.keys():\n\t\t\t\trow[\u0027value\u0027] \u003d startingRow[\u0027default\u0027]\n\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\telse:\n\t\t\t\t# underlying name of the property does exist in the \u0027alarm\u0027 object, so figure out \n\t\t\t\t# if the property has a binding or not by looking at the type of the object\n\t\t\t\tif str(type(currAlarm[underlyingName])) \u003d\u003d propBindingClass:\n\t\t\t\t\t# property has a binding, set dropdown to 0 (don\u0027t display dropdown if property is bound),\n\t\t\t\t\t# set bindType (tag or expression), make property name bold to denote the property is bound\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName][\u0027value\u0027]\n\t\t\t\t\trow[\u0027dropdown\u0027] \u003d 0\n\t\t\t\t\trow[\u0027bindType\u0027] \u003d currAlarm[underlyingName][\u0027bindType\u0027]\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"fontWeight\": \"bold\",\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\t\telse:\n\t\t\t\t\t# property does not have a binding; if property is \u0027Name\u0027, check to see if alarm is a UDT\n\t\t\t\t\t# alarm instance, then set \u0027enabled\u0027 to False (cannot change name of UDT alarm instance)\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName]\n\t\t\t\t\tif row[\u0027propName\u0027] \u003d\u003d \u0027Name\u0027:\n\t\t\t\t\t\tif len(self.view.params.udtAlarm.keys()) \u003e 0:\n\t\t\t\t\t\t\trow[\u0027enabled\u0027] \u003d False\n\t\t\t\t\t\t\t\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\t\t\t\t\n\t\t\ttableData.append(row)\n\n\treturn tableData",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "cells": {
+                "style": {
+                  "backgroundColor": "--neutral-10",
+                  "borderColor": "--neutral-100",
+                  "borderStyle": "double",
+                  "borderWidth": 1,
+                  "color": "--neutral-10949",
+                  "outlineStyle": "none"
+                }
+              },
+              "columns": [
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "propName",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "auto",
+                  "resizable": false,
+                  "sort": "none",
+                  "sortable": false,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "",
+                  "visible": true,
+                  "width": ""
+                },
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "value",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "view",
+                  "resizable": false,
+                  "sort": "none",
+                  "sortable": false,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "Exchange/Alarm Configurator/Framework/Table Cell",
+                  "visible": true,
+                  "width": ""
+                }
+              ],
+              "enableHeader": false,
+              "pager": {
+                "bottom": false
+              },
+              "rows": {
+                "height": "30px",
+                "highlight": {
+                  "color": "#DDDDDD"
+                },
+                "striped": {
+                  "enabled": false
+                }
+              },
+              "selection": {
+                "enableRowSelection": false
+              },
+              "virtualized": false
+            },
+            "type": "ia.display.table"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Expand Or Collapse"
+                },
+                "position": {
+                  "basis": "25px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.path": {
+                    "binding": {
+                      "config": {
+                        "expression": "if({.../Alarm Mode Settings Table.position.display}\u003dTrue,\u0027material/expand_more\u0027,\u0027material/expand_less\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "type": "ia.display.icon"
+              },
+              {
+                "meta": {
+                  "name": "Title"
+                },
+                "position": {
+                  "basis": "96%"
+                },
+                "props": {
+                  "text": "Alarm Mode Settings"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t# if Alarm Mode Settings section is expanded, collapse it; otherwise, expand it\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\tlogger.debug(\u0027alarm mode settings section manually \u0027 + (\u0027expanded\u0027 if self.getSibling(\"Alarm Mode Settings Table\").position.display \u003d\u003d False else \u0027closed\u0027))\n\t\t\t\n\tself.getSibling(\"Alarm Mode Settings Table\").position.display \u003d not (self.getSibling(\"Alarm Mode Settings Table\").position.display)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Alarm Mode Settings Top Bar"
+            },
+            "position": {
+              "basis": "35px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "alarmModeProps": "{../Alarm Mode Settings Table.props.data}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# if \u0027alarm\u0027 param is empty (no alarm selected), don\u0027t display this\n\t\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tif len(currAlarm.items()) \u003d\u003d 0:\n\t\treturn False\n\telse:\n\t\t# if enabledProps does not contain any alarm mode settings props, then alarm mode settings\n\t\t# table will not have any configurable properties; in this case, do not display top bar\n\t\talarmModeProps \u003d value[\u0027alarmModeProps\u0027]\n\t\n\t\t# have at least one main prop enabled\n\t\tif len(alarmModeProps) \u003e 0:\n\t\t\treturn True\n\t\telse:\n\t\t\treturn False",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/alarm-configurator/framework/alarm-properties/property-section",
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "custom": {
+              "startingData0": [
+                {
+                  "bindable": 0,
+                  "default": "Equal",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "Equal",
+                      "value": 0
+                    },
+                    {
+                      "label": "Not Equal",
+                      "value": 1
+                    },
+                    {
+                      "label": "Above Setpoint",
+                      "value": 2
+                    },
+                    {
+                      "label": "Below Setpoint",
+                      "value": 3
+                    },
+                    {
+                      "label": "Between Setpoints",
+                      "value": 4
+                    },
+                    {
+                      "label": "Outside Setpoints",
+                      "value": 5
+                    },
+                    {
+                      "label": "Out of range",
+                      "value": 6
+                    },
+                    {
+                      "label": "Bad Quality",
+                      "value": 7
+                    },
+                    {
+                      "label": "Any Change",
+                      "value": 8
+                    },
+                    {
+                      "label": "Bit State",
+                      "value": 9
+                    },
+                    {
+                      "label": "On Condition",
+                      "value": 10
+                    }
+                  ],
+                  "propName": "Mode",
+                  "underlyingName": "mode",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": 0,
+                  "dropdown": 0,
+                  "propName": "Setpoint",
+                  "underlyingName": "setpointA",
+                  "value": ""
+                }
+              ],
+              "startingData1": [
+                {
+                  "bindable": 0,
+                  "default": "Equal",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "Equal",
+                      "value": 0
+                    },
+                    {
+                      "label": "Not Equal",
+                      "value": 1
+                    },
+                    {
+                      "label": "Above Setpoint",
+                      "value": 2
+                    },
+                    {
+                      "label": "Below Setpoint",
+                      "value": 3
+                    },
+                    {
+                      "label": "Between Setpoints",
+                      "value": 4
+                    },
+                    {
+                      "label": "Outside Setpoints",
+                      "value": 5
+                    },
+                    {
+                      "label": "Out of range",
+                      "value": 6
+                    },
+                    {
+                      "label": "Bad Quality",
+                      "value": 7
+                    },
+                    {
+                      "label": "Any Change",
+                      "value": 8
+                    },
+                    {
+                      "label": "Bit State",
+                      "value": 9
+                    },
+                    {
+                      "label": "On Condition",
+                      "value": 10
+                    }
+                  ],
+                  "propName": "Mode",
+                  "underlyingName": "mode",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": 0,
+                  "dropdown": 0,
+                  "propName": "Setpoint",
+                  "underlyingName": "setpointA",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "True",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "True",
+                      "value": 0
+                    },
+                    {
+                      "label": "False",
+                      "value": 1
+                    }
+                  ],
+                  "propName": "Inclusive",
+                  "underlyingName": "inclusiveA",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "False",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "True",
+                      "value": 0
+                    },
+                    {
+                      "label": "False",
+                      "value": 1
+                    }
+                  ],
+                  "propName": "Any Change",
+                  "underlyingName": "anyChange",
+                  "value": ""
+                }
+              ],
+              "startingData2": [
+                {
+                  "bindable": 0,
+                  "default": "Equal",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "Equal",
+                      "value": 0
+                    },
+                    {
+                      "label": "Not Equal",
+                      "value": 1
+                    },
+                    {
+                      "label": "Above Setpoint",
+                      "value": 2
+                    },
+                    {
+                      "label": "Below Setpoint",
+                      "value": 3
+                    },
+                    {
+                      "label": "Between Setpoints",
+                      "value": 4
+                    },
+                    {
+                      "label": "Outside Setpoints",
+                      "value": 5
+                    },
+                    {
+                      "label": "Out of range",
+                      "value": 6
+                    },
+                    {
+                      "label": "Bad Quality",
+                      "value": 7
+                    },
+                    {
+                      "label": "Any Change",
+                      "value": 8
+                    },
+                    {
+                      "label": "Bit State",
+                      "value": 9
+                    },
+                    {
+                      "label": "On Condition",
+                      "value": 10
+                    }
+                  ],
+                  "propName": "Mode",
+                  "underlyingName": "mode",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": 0,
+                  "dropdown": 0,
+                  "propName": "Low Setpoint",
+                  "underlyingName": "setpointA",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "True",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "True",
+                      "value": 0
+                    },
+                    {
+                      "label": "False",
+                      "value": 1
+                    }
+                  ],
+                  "propName": "Low Inclusive",
+                  "underlyingName": "inclusiveA",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": 0,
+                  "dropdown": 0,
+                  "propName": "High Setpoint",
+                  "underlyingName": "setpointB",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "True",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "True",
+                      "value": 0
+                    },
+                    {
+                      "label": "False",
+                      "value": 1
+                    }
+                  ],
+                  "propName": "High Inclusive",
+                  "underlyingName": "inclusiveB",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "False",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "True",
+                      "value": 0
+                    },
+                    {
+                      "label": "False",
+                      "value": 1
+                    }
+                  ],
+                  "propName": "Any Change",
+                  "underlyingName": "anyChange",
+                  "value": ""
+                }
+              ],
+              "startingData3": [
+                {
+                  "bindable": 0,
+                  "default": "Equal",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "Equal",
+                      "value": 0
+                    },
+                    {
+                      "label": "Not Equal",
+                      "value": 1
+                    },
+                    {
+                      "label": "Above Setpoint",
+                      "value": 2
+                    },
+                    {
+                      "label": "Below Setpoint",
+                      "value": 3
+                    },
+                    {
+                      "label": "Between Setpoints",
+                      "value": 4
+                    },
+                    {
+                      "label": "Outside Setpoints",
+                      "value": 5
+                    },
+                    {
+                      "label": "Out of range",
+                      "value": 6
+                    },
+                    {
+                      "label": "Bad Quality",
+                      "value": 7
+                    },
+                    {
+                      "label": "Any Change",
+                      "value": 8
+                    },
+                    {
+                      "label": "Bit State",
+                      "value": 9
+                    },
+                    {
+                      "label": "On Condition",
+                      "value": 10
+                    }
+                  ],
+                  "propName": "Mode",
+                  "underlyingName": "mode",
+                  "value": ""
+                }
+              ],
+              "startingData4": [
+                {
+                  "bindable": 0,
+                  "default": "Equal",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "Equal",
+                      "value": 0
+                    },
+                    {
+                      "label": "Not Equal",
+                      "value": 1
+                    },
+                    {
+                      "label": "Above Setpoint",
+                      "value": 2
+                    },
+                    {
+                      "label": "Below Setpoint",
+                      "value": 3
+                    },
+                    {
+                      "label": "Between Setpoints",
+                      "value": 4
+                    },
+                    {
+                      "label": "Outside Setpoints",
+                      "value": 5
+                    },
+                    {
+                      "label": "Out of range",
+                      "value": 6
+                    },
+                    {
+                      "label": "Bad Quality",
+                      "value": 7
+                    },
+                    {
+                      "label": "Any Change",
+                      "value": 8
+                    },
+                    {
+                      "label": "Bit State",
+                      "value": 9
+                    },
+                    {
+                      "label": "On Condition",
+                      "value": 10
+                    }
+                  ],
+                  "propName": "Mode",
+                  "underlyingName": "mode",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": 0,
+                  "dropdown": 0,
+                  "propName": "Bit Position",
+                  "underlyingName": "bitPosition",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "False",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "True",
+                      "value": 0
+                    },
+                    {
+                      "label": "False",
+                      "value": 1
+                    }
+                  ],
+                  "propName": "On Zero",
+                  "underlyingName": "bitOnZero",
+                  "value": ""
+                }
+              ],
+              "startingData5": [
+                {
+                  "bindable": 0,
+                  "default": "Equal",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "Equal",
+                      "value": 0
+                    },
+                    {
+                      "label": "Not Equal",
+                      "value": 1
+                    },
+                    {
+                      "label": "Above Setpoint",
+                      "value": 2
+                    },
+                    {
+                      "label": "Below Setpoint",
+                      "value": 3
+                    },
+                    {
+                      "label": "Between Setpoints",
+                      "value": 4
+                    },
+                    {
+                      "label": "Outside Setpoints",
+                      "value": 5
+                    },
+                    {
+                      "label": "Out of range",
+                      "value": 6
+                    },
+                    {
+                      "label": "Bad Quality",
+                      "value": 7
+                    },
+                    {
+                      "label": "Any Change",
+                      "value": 8
+                    },
+                    {
+                      "label": "Bit State",
+                      "value": 9
+                    },
+                    {
+                      "label": "On Condition",
+                      "value": 10
+                    }
+                  ],
+                  "propName": "Mode",
+                  "underlyingName": "mode",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "False",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "True",
+                      "value": 0
+                    },
+                    {
+                      "label": "False",
+                      "value": 1
+                    }
+                  ],
+                  "propName": "Is Active",
+                  "underlyingName": "activeCondition",
+                  "value": ""
+                }
+              ]
+            },
+            "meta": {
+              "name": "Alarm Mode Settings Table"
+            },
+            "position": {
+              "display": false,
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.data": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "enabledProps": "{view.params.enabledProps}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# also, utilize enabledProps list to determine which properties should be enabled\n\t\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\tenabledProps \u003d value[\u0027enabledProps\u0027]\n\t\n\t# if \u0027mode\u0027 is not in the alarm object, then it must be set to the default \u0027Equal\u0027\n\t\n\tif \u0027mode\u0027 not in currAlarm.keys():\n\t\tmode \u003d \u0027Equal\u0027\n\telse:\n\t\tmode \u003d currAlarm[\u0027mode\u0027]\n\t\n\t# the properties to be displayed in this section depends on the mode of the alarm;\n\t# each of the six startingData objects contains info about the properties for this\n\t# section; find the correct startingData based on the mode\n\t\t\n\tif mode in [\u0027Equal\u0027,\u0027Not Equal\u0027]:\n\t\tdata \u003d self.custom.startingData0\n\telif mode in [\u0027Above Setpoint\u0027,\u0027Below Setpoint\u0027]:\n\t\tdata \u003d self.custom.startingData1\n\telif mode in [\u0027Between Setpoints\u0027,\u0027Outside Setpoints\u0027]:\n\t\tdata \u003d self.custom.startingData2\n\telif mode in [\u0027Out of range\u0027,\u0027Bad Quality\u0027,\u0027Any Change\u0027]:\n\t\tdata \u003d self.custom.startingData3\n\telif mode \u003d\u003d \u0027Bit State\u0027:\n\t\tdata \u003d self.custom.startingData4\n\telse:\n\t\t# only remaining option is \u0027On Condition\u0027\n\t\tdata \u003d self.custom.startingData5 \n\t\n\tpropBindingClass \u003d \"\u003ctype \u0027com.inductiveautomation.perspective.gateway.script.DotReferenceJythonMap\u0027\u003e\"\n\t\n\ttableData \u003d []\n\tfor startingRow in data:\n\t\trow \u003d dict(startingRow)\n\t\tunderlyingName \u003d row[\u0027underlyingName\u0027]\n\t\t\n\t\t# only display this property in the table if it is enabled or if the enabledProps is empty \n\t\t# (in that case, show all props)\n\t\tif underlyingName in enabledProps or len(enabledProps) \u003d\u003d 0:\n\t\t\tpropName \u003d row[\u0027propName\u0027]\n\t\t\t# if the underlying name of the property does not exist in the \u0027alarm\u0027 object, then this \n\t\t\t# property must be set to the default value\n\t\t\tif underlyingName not in currAlarm.keys():\n\t\t\t\trow[\u0027value\u0027] \u003d startingRow[\u0027default\u0027]\n\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\telse:\n\t\t\t\t# underlying name of the property does exist in the \u0027alarm\u0027 object, so figure out if the\n\t\t\t\t# property has a binding or not by looking at the type of the object\n\t\t\t\tif str(type(currAlarm[underlyingName])) \u003d\u003d propBindingClass:\n\t\t\t\t\t# property has a binding, set dropdown to 0 (don\u0027t display dropdown if property is bound),\n\t\t\t\t\t# set bindType (tag or expression), make property name bold to denote the property is bound\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName][\u0027value\u0027]\n\t\t\t\t\trow[\u0027dropdown\u0027] \u003d 0\n\t\t\t\t\trow[\u0027bindType\u0027] \u003d currAlarm[underlyingName][\u0027bindType\u0027]\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"fontWeight\": \"bold\",\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\t\telse:\n\t\t\t\t\t# property does not have a binding\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName]\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\t\t\t\n\t\t\ttableData.append(row)\n\t\t\n\treturn tableData",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "cells": {
+                "style": {
+                  "backgroundColor": "--neutral-10",
+                  "borderColor": "--neutral-100",
+                  "borderStyle": "double",
+                  "borderWidth": 1,
+                  "color": "--neutral-100",
+                  "outlineStyle": "none"
+                }
+              },
+              "columns": [
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "propName",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "auto",
+                  "resizable": true,
+                  "sort": "none",
+                  "sortable": true,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "",
+                  "visible": true,
+                  "width": ""
+                },
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "value",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "auto",
+                  "resizable": false,
+                  "sort": "none",
+                  "sortable": false,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "Exchange/Alarm Configurator/Framework/Table Cell",
+                  "visible": true,
+                  "width": ""
+                }
+              ],
+              "enableHeader": false,
+              "pager": {
+                "bottom": false
+              },
+              "rows": {
+                "height": "30px",
+                "striped": {
+                  "enabled": false
+                }
+              },
+              "selection": {
+                "enableRowSelection": false
+              },
+              "virtualized": false
+            },
+            "type": "ia.display.table"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Expand Or Collapse"
+                },
+                "position": {
+                  "basis": "25px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.path": {
+                    "binding": {
+                      "config": {
+                        "expression": "if({.../Deadbands And Time Delays Table.position.display}\u003dTrue,\u0027material/expand_more\u0027,\u0027material/expand_less\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "type": "ia.display.icon"
+              },
+              {
+                "meta": {
+                  "name": "Title"
+                },
+                "position": {
+                  "basis": "96%"
+                },
+                "props": {
+                  "text": "Deadbands and Time Delays"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t# if Deadbands and Time Delays section is expanded, collapse it; otherwise, expand it\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\tlogger.debug(\u0027deadbands and time delays section manually \u0027 + (\u0027expanded\u0027 if self.getSibling(\"Deadbands And Time Delays Table\").position.display \u003d\u003d False else \u0027closed\u0027))\n\t\n\tself.getSibling(\"Deadbands And Time Delays Table\").position.display \u003d not (self.getSibling(\"Deadbands And Time Delays Table\").position.display)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Deadbands And Time Delays Top Bar"
+            },
+            "position": {
+              "basis": "35px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "deadbandsAndTimeDelaysProps": "{../Deadbands And Time Delays Table.props.data}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# if \u0027alarm\u0027 param is empty (no alarm selected), don\u0027t display this\n\t\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tif len(currAlarm.items()) \u003d\u003d 0:\n\t\treturn False\n\telse:\n\t\t# if enabledProps does not contain any deadbands and time delays alarm props, then deadbands and\n\t\t# time delays table will not have any configurable properties; in this case, do not display top bar\n\t\tdeadbandsAndTimeDelaysProps \u003d value[\u0027deadbandsAndTimeDelaysProps\u0027]\n\t\t\n\t\t# have at least one deadband and time delay prop enabled\n\t\tif len(deadbandsAndTimeDelaysProps) \u003e 0:\n\t\t\treturn True\n\t\telse:\n\t\t\treturn False",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/alarm-configurator/framework/alarm-properties/property-section",
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "custom": {
+              "startingData": [
+                {
+                  "bindable": 1,
+                  "default": 0,
+                  "dropdown": 0,
+                  "propName": "Deadband",
+                  "underlyingName": "deadband",
+                  "value": ""
+                },
+                {
+                  "bindable": 0,
+                  "default": "Absolute",
+                  "dropdown": 1,
+                  "options": [
+                    {
+                      "label": "Absolute",
+                      "value": 0
+                    },
+                    {
+                      "label": "Percent",
+                      "value": 1
+                    },
+                    {
+                      "label": "Off",
+                      "value": 2
+                    }
+                  ],
+                  "propName": "Deadband Mode",
+                  "underlyingName": "deadbandMode",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": 0,
+                  "dropdown": 0,
+                  "propName": "Active delay (seconds)",
+                  "underlyingName": "timeOnDelaySeconds",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": 0,
+                  "dropdown": 0,
+                  "propName": "Clear delay (seconds)",
+                  "underlyingName": "timeOffDelaySeconds",
+                  "value": ""
+                }
+              ]
+            },
+            "meta": {
+              "name": "Deadbands And Time Delays Table"
+            },
+            "position": {
+              "display": false,
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.data": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "enabledProps": "{view.params.enabledProps}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# get the startingData; for each property in this section, startingData contains\n\t# the display name (ex: Display Path), the underlying name (ex: displayPath), a \n\t# flag denoting whether this property is listable or not, and other pieces of info\n\t\n\t# also, utilize enabledProps list to determine which properties should be enabled\n\t\t\n\tenabledProps \u003d value[\u0027enabledProps\u0027]\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tdata \u003d self.custom.startingData\n\ttableData \u003d []\n\t\n\tpropBindingClass \u003d \"\u003ctype \u0027com.inductiveautomation.perspective.gateway.script.DotReferenceJythonMap\u0027\u003e\"\n\t\n\tfor startingRow in data:\n\t\trow \u003d dict(startingRow)\n\t\tunderlyingName \u003d row[\u0027underlyingName\u0027]\n\t\t\n\t\t# only display this property in the table if it is enabled or if the enabledProps is \n\t\t# empty (in that case, show all props)\n\t\tif underlyingName in enabledProps or len(enabledProps) \u003d\u003d 0:\n\t\t\tpropName \u003d row[\u0027propName\u0027]\n\t\t\n\t\t\t# if the underlying name of the property does not exist in the \u0027alarm\u0027 object, then this \n\t\t\t# property must be set to the default value\n\t\t\tif underlyingName not in currAlarm.keys():\n\t\t\t\trow[\u0027value\u0027] \u003d startingRow[\u0027default\u0027]\n\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\telse:\n\t\t\t\t# underlying name of the property does exist in the \u0027alarm\u0027 object, so figure out if the\n\t\t\t\t# property has a binding or not by looking at the type of the object\n\t\t\t\tif str(type(currAlarm[underlyingName])) \u003d\u003d propBindingClass:\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName][\u0027value\u0027]\n\t\t\t\t\trow[\u0027dropdown\u0027] \u003d 0\n\t\t\t\t\trow[\u0027bindType\u0027] \u003d currAlarm[underlyingName][\u0027bindType\u0027]\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"fontWeight\": \"bold\",\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\t\telse:\n\t\t\t\t\t# property does not have a binding; if property is \u0027Name\u0027, check to see if alarm is\n\t\t\t\t\t# a UDT alarm instance, then set \u0027enabled\u0027 to False (cannot change name of UDT alarm instance)\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName]\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\t\n\t\t\ttableData.append(row)\n\t\t\n\treturn tableData",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "cells": {
+                "style": {
+                  "backgroundColor": "--neutral-10",
+                  "borderColor": "--neutral-100",
+                  "borderStyle": "double",
+                  "borderWidth": 1,
+                  "color": "--neutral-10949",
+                  "outlineStyle": "none"
+                }
+              },
+              "columns": [
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "propName",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "auto",
+                  "resizable": true,
+                  "sort": "none",
+                  "sortable": true,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "",
+                  "visible": true,
+                  "width": ""
+                },
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "value",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "view",
+                  "resizable": false,
+                  "sort": "none",
+                  "sortable": false,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "Exchange/Alarm Configurator/Framework/Table Cell",
+                  "visible": true,
+                  "width": ""
+                }
+              ],
+              "enableHeader": false,
+              "pager": {
+                "bottom": false
+              },
+              "rows": {
+                "height": "30px",
+                "highlight": {
+                  "color": "#DDDDDD"
+                },
+                "striped": {
+                  "enabled": false
+                }
+              },
+              "selection": {
+                "enableRowSelection": false
+              },
+              "virtualized": false
+            },
+            "type": "ia.display.table"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Expand Or Collapse"
+                },
+                "position": {
+                  "basis": "25px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.path": {
+                    "binding": {
+                      "config": {
+                        "expression": "if({.../Notification Table.position.display}\u003dTrue,\u0027material/expand_more\u0027,\u0027material/expand_less\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "type": "ia.display.icon"
+              },
+              {
+                "meta": {
+                  "name": "Title"
+                },
+                "position": {
+                  "basis": "96%"
+                },
+                "props": {
+                  "text": "Notification"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t# if Notification section is expanded, collapse it; otherwise, expand it\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\tlogger.debug(\u0027notification section manually \u0027 + (\u0027expanded\u0027 if self.getSibling(\"Notification Table\").position.display \u003d\u003d False else \u0027closed\u0027))\n\t\n\tself.getSibling(\"Notification Table\").position.display \u003d not (self.getSibling(\"Notification Table\").position.display)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Notification Top Bar"
+            },
+            "position": {
+              "basis": "35px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "notificationProps": "{../Notification Table.props.data}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# if \u0027alarm\u0027 param is empty (no alarm selected), don\u0027t display this\n\t\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tif len(currAlarm.items()) \u003d\u003d 0:\n\t\treturn False\n\telse:\n\t\t# if enabledProps does not contain any notification props, then notification table will not\n\t\t# have any configurable properties; in this case, do not display top bar\n\t\tnotificationProps \u003d value[\u0027notificationProps\u0027]\n\t\t\n\t\t# have at least one notification prop enabled\n\t\tif len(notificationProps) \u003e 0:\n\t\t\treturn True\n\t\telse:\n\t\t\treturn False",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/alarm-configurator/framework/alarm-properties/property-section",
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "custom": {
+              "startingData": [
+                {
+                  "bindable": 1,
+                  "default": "",
+                  "dropdown": 1,
+                  "propName": "Ack Pipeline",
+                  "underlyingName": "ackPipeline",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "",
+                  "dropdown": 1,
+                  "propName": "Active Pipeline",
+                  "underlyingName": "activePipeline",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "",
+                  "dropdown": 2,
+                  "propName": "Clear Pipeline",
+                  "underlyingName": "clearPipeline",
+                  "value": ""
+                }
+              ]
+            },
+            "meta": {
+              "name": "Notification Table"
+            },
+            "position": {
+              "display": false,
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.pipelines": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.alarm"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tfrom com.inductiveautomation.ignition.gateway import IgnitionGateway\n\t\n\t# retrieve a list of projects that exist in this gateway\n\tprojectNames \u003d list(IgnitionGateway.get().getProjectManager().projectNames)\n\t\n\tpipelineList \u003d []\n\t\n\tpipelineList.append({\u0027value\u0027:0,\u0027label\u0027:\u0027\u003cNone\u003e\u0027})\n\ti \u003d 1\n\t\n\t# for each project, call listPipelines to get a list of pipelines, and append the list\n\t# of pipelines along with the project name to the pipelineList\n\tfor project in projectNames:\n\t\tpipelines \u003d system.alarm.listPipelines(project)\n\t\tfor elem in pipelines:\n\t\t\tpipelineList.append({\u0027value\u0027:i,\u0027label\u0027:project + \u0027/\u0027 + elem})\n\t\t\ti \u003d i + 1\n\t\t\n\treturn pipelineList",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.startingData[0].options": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.pipelines"
+                  },
+                  "type": "property"
+                }
+              },
+              "custom.startingData[1].options": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.pipelines"
+                  },
+                  "type": "property"
+                }
+              },
+              "custom.startingData[2].options": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.pipelines"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.data": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "enabledProps": "{view.params.enabledProps}",
+                      "pipelines": "{this.custom.pipelines}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# get the startingData; for each property in this section, startingData contains\n\t# the display name (ex: Display Path), the underlying name (ex: displayPath), a \n\t# flag denoting whether this property is listable or not, and other pieces of info\n\t\n\t# also, utilize enabledProps list to determine which properties should be enabled\n\t\t\n\tenabledProps \u003d value[\u0027enabledProps\u0027]\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tdata \u003d self.custom.startingData\n\ttableData \u003d []\n\t\n\tpropBindingClass \u003d \"\u003ctype \u0027com.inductiveautomation.perspective.gateway.script.DotReferenceJythonMap\u0027\u003e\"\n\t\n\tfor startingRow in data:\n\t\trow \u003d dict(startingRow)\n\t\t\n\t\tunderlyingName \u003d row[\u0027underlyingName\u0027]\n\t\t\n\t\tif underlyingName in enabledProps or len(enabledProps) \u003d\u003d 0:\n\t\t\tpropName \u003d row[\u0027propName\u0027]\n\t\t\t# if the underlying name of the property does not exist in the \u0027alarm\u0027 object, then \n\t\t\t# this property must be set to the default value\n\t\t\tif underlyingName not in currAlarm.keys():\n\t\t\t\trow[\u0027value\u0027] \u003d startingRow[\u0027default\u0027]\n\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\telse:\n\t\t\t\t# underlying name of the property does exist in the \u0027alarm\u0027 object, so figure out if \n\t\t\t\t# the property has a binding or not by looking at the type of the object\n\t\t\t\tif str(type(currAlarm[underlyingName])) \u003d\u003d propBindingClass:\n\t\t\t\t\t# property has a binding, set dropdown to 0 (don\u0027t display dropdown if property is bound),\n\t\t\t\t\t# set bindType (tag or expression), make property name bold to denote the property is bound\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName][\u0027value\u0027]\n\t\t\t\t\trow[\u0027dropdown\u0027] \u003d 0\n\t\t\t\t\trow[\u0027bindType\u0027] \u003d currAlarm[underlyingName][\u0027bindType\u0027]\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"fontWeight\": \"bold\",\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\t\telse:\n\t\t\t\t\t# property does not have a binding; if property is \u0027Name\u0027, check to see if alarm is a UDT\n\t\t\t\t\t# alarm instance, then set \u0027enabled\u0027 to False (cannot change name of UDT alarm instance)\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName]\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\ttableData.append(row)\n\t\t\n\treturn tableData",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "cells": {
+                "style": {
+                  "backgroundColor": "--neutral-10",
+                  "borderColor": "--neutral-100",
+                  "borderStyle": "double",
+                  "borderWidth": 1,
+                  "color": "--neutral-10949",
+                  "outlineStyle": "none"
+                }
+              },
+              "columns": [
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "propName",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "auto",
+                  "resizable": true,
+                  "sort": "none",
+                  "sortable": true,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "",
+                  "visible": true,
+                  "width": ""
+                },
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "value",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "view",
+                  "resizable": false,
+                  "sort": "none",
+                  "sortable": false,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "Exchange/Alarm Configurator/Framework/Table Cell",
+                  "visible": true,
+                  "width": ""
+                }
+              ],
+              "enableHeader": false,
+              "pager": {
+                "bottom": false
+              },
+              "rows": {
+                "height": "30px",
+                "highlight": {
+                  "color": "#DDDDDD"
+                },
+                "striped": {
+                  "enabled": false
+                }
+              },
+              "selection": {
+                "enableRowSelection": false
+              },
+              "virtualized": false
+            },
+            "type": "ia.display.table"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Expand Or Collapse"
+                },
+                "position": {
+                  "basis": "25px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.path": {
+                    "binding": {
+                      "config": {
+                        "expression": "if({.../Phone Call Settings Table.position.display}\u003dTrue,\u0027material/expand_more\u0027,\u0027material/expand_less\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "type": "ia.display.icon"
+              },
+              {
+                "meta": {
+                  "name": "Title"
+                },
+                "position": {
+                  "basis": "96%"
+                },
+                "props": {
+                  "text": "Phone Call Settings"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t# if Phone Call Settings section is expanded, collapse it; otherwise, expand it\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\tlogger.debug(\u0027phone call settings section manually \u0027 + (\u0027expanded\u0027 if self.getSibling(\"Phone Call Settings Table\").position.display \u003d\u003d False else \u0027closed\u0027))\n\t\n\tself.getSibling(\"Phone Call Settings Table\").position.display \u003d not (self.getSibling(\"Phone Call Settings Table\").position.display)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Phone Call Settings Top Bar"
+            },
+            "position": {
+              "basis": "35px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "phoneCallProps": "{../Phone Call Settings Table.props.data}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# if \u0027alarm\u0027 param is empty (no alarm selected), don\u0027t display this\n\t\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tif len(currAlarm.items()) \u003d\u003d 0:\n\t\treturn False\n\telse:\n\t\t# if enabledProps does not contain any phone call alarm props, then phone call table will not\n\t\t# have any configurable properties; in this case, do not display top bar\n\t\tphoneCallProps \u003d value[\u0027phoneCallProps\u0027]\n\t\t\n\t\t# have at least one phone call prop enabled\n\t\tif len(phoneCallProps) \u003e 0:\n\t\t\treturn True\n\t\telse:\n\t\t\treturn False",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/alarm-configurator/framework/alarm-properties/property-section",
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "custom": {
+              "startingData": [
+                {
+                  "bindable": 1,
+                  "default": "",
+                  "dropdown": 0,
+                  "propName": "Custom Message",
+                  "underlyingName": "voip_customMessage",
+                  "value": ""
+                }
+              ]
+            },
+            "meta": {
+              "name": "Phone Call Settings Table"
+            },
+            "position": {
+              "display": false,
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.data": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "enabledProps": "{view.params.enabledProps}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# get the startingData; for each property in this section, startingData contains \n\t# the display name (ex: Display Path), the underlying name (ex: displayPath), a \n\t# flag denoting whether this property is listable or not, and other pieces of info\n\t\n\t# also, utilize enabledProps list to determine which properties should be enabled\n\t\t\n\tenabledProps \u003d value[\u0027enabledProps\u0027]\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tdata \u003d self.custom.startingData\n\ttableData \u003d []\n\t\n\tpropBindingClass \u003d \"\u003ctype \u0027com.inductiveautomation.perspective.gateway.script.DotReferenceJythonMap\u0027\u003e\"\n\t\n\tfor startingRow in data:\n\t\trow \u003d dict(startingRow)\n\t\tunderlyingName \u003d row[\u0027underlyingName\u0027]\n\t\t\n\t\t# only display this property in the table if it is enabled or if the enabledProps is empty \n\t\t# (in that case, show all props)\n\t\tif underlyingName in enabledProps or len(enabledProps) \u003d\u003d 0:\n\t\t\tpropName \u003d row[\u0027propName\u0027]\n\t\t\t# if the underlying name of the property does not exist in the \u0027alarm\u0027 object, then this \n\t\t\t# property must be set to the default value\n\t\t\tif underlyingName not in currAlarm.keys():\n\t\t\t\trow[\u0027value\u0027] \u003d startingRow[\u0027default\u0027]\n\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\telse:\n\t\t\t\t# underlying name of the property does exist in the \u0027alarm\u0027 object, so figure out if the\n\t\t\t\t# property has a binding or not by looking at the type of the object\n\t\t\t\tif str(type(currAlarm[underlyingName])) \u003d\u003d propBindingClass:\n\t\t\t\t\t# property has a binding, set dropdown to 0 (don\u0027t display dropdown if property is bound),\n\t\t\t\t\t# set bindType (tag or expression), make property name bold to denote the property is bound\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName][\u0027value\u0027]\n\t\t\t\t\trow[\u0027dropdown\u0027] \u003d 0\n\t\t\t\t\trow[\u0027bindType\u0027] \u003d currAlarm[underlyingName][\u0027bindType\u0027]\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"fontWeight\": \"bold\",\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\t\telse:\n\t\t\t\t\t# property does not have a binding; if property is \u0027Name\u0027, check to see if alarm is a UDT\n\t\t\t\t\t# alarm instance, then set \u0027enabled\u0027 to False (cannot change name of UDT alarm instance)\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName]\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\ttableData.append(row)\n\t\t\n\treturn tableData",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "cells": {
+                "style": {
+                  "backgroundColor": "--neutral-10",
+                  "borderColor": "--neutral-100",
+                  "borderStyle": "double",
+                  "borderWidth": 1,
+                  "color": "--neutral-10949",
+                  "outlineStyle": "none"
+                }
+              },
+              "columns": [
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "propName",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "auto",
+                  "resizable": true,
+                  "sort": "none",
+                  "sortable": true,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "",
+                  "visible": true,
+                  "width": ""
+                },
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "value",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "view",
+                  "resizable": false,
+                  "sort": "none",
+                  "sortable": false,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "Exchange/Alarm Configurator/Framework/Table Cell",
+                  "visible": true,
+                  "width": ""
+                }
+              ],
+              "enableHeader": false,
+              "pager": {
+                "bottom": false
+              },
+              "rows": {
+                "height": "30px",
+                "highlight": {
+                  "color": "#DDDDDD"
+                },
+                "striped": {
+                  "enabled": false
+                }
+              },
+              "selection": {
+                "enableRowSelection": false
+              },
+              "virtualized": false
+            },
+            "type": "ia.display.table"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Expand Or Collapse"
+                },
+                "position": {
+                  "basis": "25px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.path": {
+                    "binding": {
+                      "config": {
+                        "expression": "if({.../Email Notification Properties Table.position.display}\u003dTrue,\u0027material/expand_more\u0027,\u0027material/expand_less\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "type": "ia.display.icon"
+              },
+              {
+                "meta": {
+                  "name": "Title"
+                },
+                "position": {
+                  "basis": "96%"
+                },
+                "props": {
+                  "text": "Email Notification Properties"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t# if Email Notification Properties section is expanded, collapse it; otherwise, expand it\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\tlogger.debug(\u0027email notification section manually \u0027 + (\u0027expanded\u0027 if self.getSibling(\"Email Notification Properties Table\").position.display \u003d\u003d False else \u0027closed\u0027))\n\t\n\tself.getSibling(\"Email Notification Properties Table\").position.display \u003d not (self.getSibling(\"Email Notification Properties Table\").position.display)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Email Notification Properties Top Bar"
+            },
+            "position": {
+              "basis": "35px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "emailProps": "{../Email Notification Properties Table.props.data}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# if \u0027alarm\u0027 param is empty (no alarm selected), don\u0027t display this\n\t\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tif len(currAlarm.items()) \u003d\u003d 0:\n\t\treturn False\n\telse:\n\t\t# if enabledProps does not contain any email alarm props, then email table will not\n\t\t# have any configurable properties; in this case, do not display top bar\n\t\temailProps \u003d value[\u0027emailProps\u0027]\n\t\t\n\t\t# have at least one email prop enabled\n\t\tif len(emailProps) \u003e 0:\n\t\t\treturn True\n\t\telse:\n\t\t\treturn False",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/alarm-configurator/framework/alarm-properties/property-section",
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "custom": {
+              "startingData": [
+                {
+                  "bindable": 1,
+                  "default": "",
+                  "dropdown": 0,
+                  "propName": "Custom Message",
+                  "underlyingName": "CustomEmailMessage",
+                  "value": ""
+                },
+                {
+                  "bindable": 1,
+                  "default": "",
+                  "dropdown": 0,
+                  "propName": "Custom Subject",
+                  "underlyingName": "CustomEmailSubject",
+                  "value": ""
+                }
+              ]
+            },
+            "meta": {
+              "name": "Email Notification Properties Table"
+            },
+            "position": {
+              "display": false,
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.data": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "enabledProps": "{view.params.enabledProps}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# get the startingData; for each property in this section, startingData contains the \n\t# display name (ex: Display Path), the underlying name (ex: displayPath), a flag \n\t# denoting whether this property is listable or not, and other pieces of info\n\t\n\t# also, utilize enabledProps list to determine which properties should be enabled\n\t\t\n\tenabledProps \u003d value[\u0027enabledProps\u0027]\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tdata \u003d self.custom.startingData\n\ttableData \u003d []\n\t\n\tpropBindingClass \u003d \"\u003ctype \u0027com.inductiveautomation.perspective.gateway.script.DotReferenceJythonMap\u0027\u003e\"\n\t\n\tfor startingRow in data:\n\t\trow \u003d dict(startingRow)\n\t\tunderlyingName \u003d row[\u0027underlyingName\u0027]\n\t\t\n\t\t# only display this property in the table if it is enabled or if the enabledProps is \n\t\t# empty (in that case, show all props)\n\t\tif underlyingName in enabledProps or len(enabledProps) \u003d\u003d 0:\n\t\t\tpropName \u003d row[\u0027propName\u0027]\n\t\t\t\n\t\t\t# if the underlying name of the property does not exist in the \u0027alarm\u0027 object, then \n\t\t\t# this property must be set to the default value\n\t\t\tif underlyingName not in currAlarm.keys():\n\t\t\t\trow[\u0027value\u0027] \u003d startingRow[\u0027default\u0027]\n\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\telse:\n\t\t\t\t# underlying name of the property does exist in the \u0027alarm\u0027 object, so figure out \n\t\t\t\t# if the property has a binding or not by looking at the type of the object\n\t\t\t\tif str(type(currAlarm[underlyingName])) \u003d\u003d propBindingClass:\n\t\t\t\t\t# property has a binding, set dropdown to 0 (don\u0027t display dropdown if property is\n\t\t\t\t\t# bound), set bindType (tag or expression), make property name bold to denote the \n\t\t\t\t\t# property is bound\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName][\u0027value\u0027]\n\t\t\t\t\trow[\u0027dropdown\u0027] \u003d 0\n\t\t\t\t\trow[\u0027bindType\u0027] \u003d currAlarm[underlyingName][\u0027bindType\u0027]\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"fontWeight\": \"bold\",\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\t\telse:\n\t\t\t\t\t# property does not have a binding; if property is \u0027Name\u0027, check to see if alarm is\n\t\t\t\t\t# a UDT alarm instance, then set \u0027enabled\u0027 to False (cannot change name of UDT alarm \n\t\t\t\t\t# instance)\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName]\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\ttableData.append(row)\n\t\t\n\treturn tableData",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "cells": {
+                "style": {
+                  "backgroundColor": "--neutral-10",
+                  "borderColor": "--neutral-100",
+                  "borderStyle": "double",
+                  "borderWidth": 1,
+                  "color": "--neutral-10949",
+                  "outlineStyle": "none"
+                }
+              },
+              "columns": [
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "propName",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "auto",
+                  "resizable": true,
+                  "sort": "none",
+                  "sortable": true,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "",
+                  "visible": true,
+                  "width": ""
+                },
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "value",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "view",
+                  "resizable": false,
+                  "sort": "none",
+                  "sortable": false,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "Exchange/Alarm Configurator/Framework/Table Cell",
+                  "visible": true,
+                  "width": ""
+                }
+              ],
+              "enableHeader": false,
+              "pager": {
+                "bottom": false
+              },
+              "rows": {
+                "height": "30px",
+                "highlight": {
+                  "color": "#DDDDDD"
+                },
+                "striped": {
+                  "enabled": false
+                }
+              },
+              "selection": {
+                "enableRowSelection": false
+              },
+              "virtualized": false
+            },
+            "type": "ia.display.table"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Expand Or Collapse"
+                },
+                "position": {
+                  "basis": "25px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.path": {
+                    "binding": {
+                      "config": {
+                        "expression": "if({.../Sms Notification Properties Table.position.display}\u003dTrue,\u0027material/expand_more\u0027,\u0027material/expand_less\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "type": "ia.display.icon"
+              },
+              {
+                "meta": {
+                  "name": "Title"
+                },
+                "position": {
+                  "basis": "96%"
+                },
+                "props": {
+                  "text": "SMS Notification Properties"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t# if SMS Notification Properties section is expanded, collapse it; otherwise, expand it\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\tlogger.debug(\u0027sms notification section manually \u0027 + (\u0027expanded\u0027 if self.getSibling(\"Sms Notification Properties Table\").position.display \u003d\u003d False else \u0027closed\u0027))\n\t\n\tself.getSibling(\"Sms Notification Properties Table\").position.display \u003d not (self.getSibling(\"Sms Notification Properties Table\").position.display)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Sms Notification Properties Top Bar"
+            },
+            "position": {
+              "basis": "35px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "smsProps": "{../Sms Notification Properties Table.props.data}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# if \u0027alarm\u0027 param is empty (no alarm selected), don\u0027t display this\n\t\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tif len(currAlarm.items()) \u003d\u003d 0:\n\t\treturn False\n\telse:\n\t\t# if enabledProps does not contain any sms alarm props, then sms table will not\n\t\t# have any configurable properties; in this case, do not display top bar\n\t\tsmsProps \u003d value[\u0027smsProps\u0027]\n\t\t\n\t\t# have at least one sms prop enabled\n\t\tif len(smsProps) \u003e 0:\n\t\t\treturn True\n\t\telse:\n\t\t\treturn False",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/alarm-configurator/framework/alarm-properties/property-section",
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "custom": {
+              "startingData": [
+                {
+                  "bindable": 1,
+                  "default": "",
+                  "dropdown": 0,
+                  "propName": "Custom Message",
+                  "underlyingName": "CustomSmsMessage",
+                  "value": ""
+                }
+              ]
+            },
+            "meta": {
+              "name": "Sms Notification Properties Table"
+            },
+            "position": {
+              "display": false,
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.data": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "enabledProps": "{view.params.enabledProps}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# get the startingData; for each property in this section, startingData contains\n\t# the display name (ex: Display Path), the underlying name (ex: displayPath), a \n\t# flag denoting whether this property is listable or not, and other pieces of info\n\t\n\t# also, utilize enabledProps list to determine which properties should be enabled\n\t\t\n\tenabledProps \u003d value[\u0027enabledProps\u0027]\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tdata \u003d self.custom.startingData\n\ttableData \u003d []\n\t\n\tpropBindingClass \u003d \"\u003ctype \u0027com.inductiveautomation.perspective.gateway.script.DotReferenceJythonMap\u0027\u003e\"\n\t\n\tfor startingRow in data:\n\t\trow \u003d dict(startingRow)\n\t\tunderlyingName \u003d row[\u0027underlyingName\u0027]\n\t\t\n\t\t# only display this property in the table if it is enabled or if the enabledProps is\n\t\t# empty (in that case, show all props)\n\t\tif underlyingName in enabledProps or len(enabledProps) \u003d\u003d 0:\t\n\t\t\tpropName \u003d row[\u0027propName\u0027]\n\t\t\t\n\t\t\t# if the underlying name of the property does not exist in the \u0027alarm\u0027 object, then\n\t\t\t# this property must be set to the default value\n\t\t\tif underlyingName not in currAlarm.keys():\n\t\t\t\trow[\u0027value\u0027] \u003d startingRow[\u0027default\u0027]\n\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\telse:\n\t\t\t\t# underlying name of the property does exist in the \u0027alarm\u0027 object, so figure out\n\t\t\t\t# if the property has a binding or not by looking at the type of the object\n\t\t\t\tif str(type(currAlarm[underlyingName])) \u003d\u003d propBindingClass:\n\t\t\t\t\t# property has a binding, set dropdown to 0 (don\u0027t display dropdown if property is \n\t\t\t\t\t# bound), set bindType (tag or expression), make property name bold to denote the \n\t\t\t\t\t# property is bound\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName][\u0027value\u0027]\n\t\t\t\t\trow[\u0027dropdown\u0027] \u003d 0\n\t\t\t\t\trow[\u0027bindType\u0027] \u003d currAlarm[underlyingName][\u0027bindType\u0027]\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"fontWeight\": \"bold\",\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\t\telse:\n\t\t\t\t\t# property does not have a binding; if property is \u0027Name\u0027, check to see if alarm is\n\t\t\t\t\t# a UDT alarm instance, then set \u0027enabled\u0027 to False (cannot change name of UDT alarm \n\t\t\t\t\t# instance)\n\t\t\t\t\trow[\u0027value\u0027] \u003d currAlarm[underlyingName]\n\t\t\t\t\trow[\u0027propName\u0027] \u003d {\"value\": propName, \"editable\": False, \"style\": {\"paddingLeft\":\u00278px\u0027,\"classes\": \"\"},\"align\": \"center\",\"justify\": \"left\"}\n\t\t\ttableData.append(row)\n\t\t\n\treturn tableData",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "cells": {
+                "style": {
+                  "backgroundColor": "--neutral-10",
+                  "borderColor": "--neutral-100",
+                  "borderStyle": "double",
+                  "borderWidth": 1,
+                  "color": "--neutral-10949",
+                  "outlineStyle": "none"
+                }
+              },
+              "columns": [
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "propName",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "auto",
+                  "resizable": true,
+                  "sort": "none",
+                  "sortable": true,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "",
+                  "visible": true,
+                  "width": ""
+                },
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "value",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "view",
+                  "resizable": false,
+                  "sort": "none",
+                  "sortable": false,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "Exchange/Alarm Configurator/Framework/Table Cell",
+                  "visible": true,
+                  "width": ""
+                }
+              ],
+              "enableHeader": false,
+              "pager": {
+                "bottom": false
+              },
+              "rows": {
+                "height": "30px",
+                "highlight": {
+                  "color": "#DDDDDD"
+                },
+                "striped": {
+                  "enabled": false
+                }
+              },
+              "selection": {
+                "enableRowSelection": false
+              },
+              "virtualized": false
+            },
+            "type": "ia.display.table"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Expand Or Collapse"
+                },
+                "position": {
+                  "basis": "25px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.path": {
+                    "binding": {
+                      "config": {
+                        "expression": "if({.../Associated Data Table.position.display}\u003dTrue,\u0027material/expand_more\u0027,\u0027material/expand_less\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "type": "ia.display.icon"
+              },
+              {
+                "meta": {
+                  "name": "Title"
+                },
+                "position": {
+                  "basis": "96%"
+                },
+                "props": {
+                  "text": "Associated Data"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t# if Associated Data section is expanded, collapse it; otherwise, expand it\n\t\n\tlogger \u003d system.util.getLogger(\u0027configurator.alarmproperties\u0027)\n\tlogger.debug(\u0027associated data section manually \u0027 + (\u0027expanded\u0027 if self.getSibling(\"Associated Data Table\").position.display \u003d\u003d False else \u0027closed\u0027))\n\t\n\tself.getSibling(\"Associated Data Table\").position.display \u003d not (self.getSibling(\"Associated Data Table\").position.display)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Associated Data Top Bar"
+            },
+            "position": {
+              "basis": "35px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "associatedProps": "{../Associated Data Table.props.data}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# if \u0027alarm\u0027 param is empty (no alarm selected), don\u0027t display this\n\t\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\tif len(currAlarm.items()) \u003d\u003d 0:\n\t\treturn False\n\telse:\n\t\t# if enabledProps does not contain any associated data props, then associated data table will not\n\t\t# have any configurable properties; in this case, do not display top bar\n\t\tassociatedProps \u003d value[\u0027associatedProps\u0027]\n\t\t\n\t\t# have at least one associated data prop enabled\n\t\tif len(associatedProps) \u003e 0:\n\t\t\treturn True\n\t\telse:\n\t\t\treturn False",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/alarm-configurator/framework/alarm-properties/property-section",
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "custom": {
+              "startingData": [
+                {
+                  "bindable": 1,
+                  "dropdown": 0,
+                  "propName": "",
+                  "underlyingName": "",
+                  "value": ""
+                }
+              ]
+            },
+            "meta": {
+              "name": "Associated Data Table"
+            },
+            "position": {
+              "display": false,
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.data": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "alarm": "{view.params.alarm}",
+                      "associatedDataMode": "{view.params.associatedDataMode}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# get the row \u0027template\u0027 from startingData; contains general info regarding \n\t# associated data properties\n\tcurrAlarm \u003d value[\u0027alarm\u0027]\n\t\n\ttableData \u003d []\n\t\n\t# if associatedDataMode is \u0027ViewEdit\u0027, then the user has the ability\n\t# view, edit, add, or remove associated data properties; if mode\n\t# is set to \u0027ViewOnly\u0027, then the user can only view the associated\n\t# data properties. If the mode is set to \u0027Hidden\u0027, then the\n\t# associated data properties are hidden.\n\t\n\tassociatedDataMode \u003d value[\u0027associatedDataMode\u0027]\n\t\n\tif associatedDataMode \u003d\u003d \u0027Hidden\u0027:\n\t\t# do not display any associated data properties\n\t\treturn tableData\n\telif associatedDataMode \u003d\u003d \u0027ViewOnly\u0027:\n\t\t# set enabled to 0, which is passed to both the view that displays\n\t\t# the name of the associated data property (prevents user from\n\t\t# changing name of associated data property) and the view that\n\t\t# displays the current value (prevents user from changing value)\n\t\tenabled \u003d 0\n\telse:\n\t\tenabled \u003d 1\n\t\t\n\tdataRow \u003d self.custom.startingData[0]\n\tbuiltInProperties \u003d {\u0027name\u0027,\u0027enabled\u0027,\u0027priority\u0027,\u0027timestampSource\u0027,\n\t\t\t\t\t\t\t\u0027label\u0027,\u0027displayPath\u0027,\u0027ackMode\u0027,\u0027notes\u0027,\u0027ackNotesReqd\u0027,\n\t\t\t\t\t\t\t\u0027shelvingAllowed\u0027,\u0027mode\u0027,\u0027setpointA\u0027,\u0027inclusiveA\u0027,\u0027anyChange\u0027,\n\t\t\t\t\t\t\t\u0027setpointB\u0027,\u0027inclusiveB\u0027,\u0027bitPosition\u0027,\u0027bitOnZero\u0027,\u0027isActive\u0027,\n\t\t\t\t\t\t\t\u0027deadband\u0027,\u0027deadbandMode\u0027,\u0027timeOnDelaySeconds\u0027,\u0027timeOffDelaySeconds\u0027,\n\t\t\t\t\t\t\t\u0027ackPipeline\u0027,\u0027activePipeline\u0027,\u0027clearPipeline\u0027,\u0027voip_customMessage\u0027,\n\t\t\t\t\t\t\t\u0027CustomEmailMessage\u0027,\u0027CustomEmailSubject\u0027,\u0027CustomSmsMessage\u0027,\u0027activeCondition\u0027}\n\t\n\t# convert the keys of the alarm object to a set, and then perform a difference \n\t# with the above set (contains the underlying names of the built-in alarm \n\t# properties) to obtain a list of associated data property names\n\tassociatedDataProps \u003d list(set(currAlarm.keys()).difference(builtInProperties))\n\n\tpropBindingClass \u003d \"\u003ctype \u0027com.inductiveautomation.perspective.gateway.script.DotReferenceJythonMap\u0027\u003e\"\n\t\n\tfor prop in associatedDataProps:\n\t\trow \u003d dict(dataRow)\n\t\trow[\u0027underlyingName\u0027] \u003d prop\n\t\trow[\u0027enabled\u0027] \u003d enabled\n\t\t\n\t\tif str(type(currAlarm[prop])) \u003d\u003d propBindingClass:\n\t\t\t# property has a binding, set bound to 1 (makes name bold in ad-name-cell view),\n\t\t\t# set bindType (tag or expression), set value and propName\n\t\t\trow[\u0027value\u0027] \u003d currAlarm[prop][\u0027value\u0027]\n\t\t\trow[\u0027bindType\u0027] \u003d currAlarm[prop][\u0027bindType\u0027]\n\t\t\trow[\u0027bound\u0027] \u003d 1\n\t\t\trow[\u0027propName\u0027] \u003d {\u0027value\u0027:prop}\n\t\telse:\n\t\t\t# property does not have a binding\n\t\t\trow[\u0027value\u0027] \u003d currAlarm[prop]\n\t\t\trow[\u0027propName\u0027] \u003d {\u0027value\u0027:prop}\n\t\t\trow[\u0027bound\u0027] \u003d 0\n\t\t\n\t\t# include names of all associated data props, so that if name is changed, ad-name-cell\n\t\t# view knows if the name is duplicate or not\n\t\trow[\u0027adNames\u0027] \u003d associatedDataProps\t\t\n\t\ttableData.append(row)\n\t\n\tif self.props.selection.selectedRow !\u003d None:\n\t\tself.props.selection.selectedRow \u003d None\n\t\n\treturn sorted(tableData, key\u003dlambda k: k[\u0027underlyingName\u0027])",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "cells": {
+                "style": {
+                  "backgroundColor": "--neutral-10",
+                  "borderColor": "--neutral-100",
+                  "borderStyle": "double",
+                  "borderWidth": 1,
+                  "color": "--neutral-10949",
+                  "outlineStyle": "none"
+                }
+              },
+              "columns": [
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "propName",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "center",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "view",
+                  "resizable": true,
+                  "sort": "none",
+                  "sortable": true,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "Exchange/Alarm Configurator/Framework/AD Name Cell",
+                  "visible": true,
+                  "width": ""
+                },
+                {
+                  "align": "center",
+                  "boolean": "checkbox",
+                  "dateFormat": "MM/DD/YYYY",
+                  "editable": false,
+                  "field": "value",
+                  "footer": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "header": {
+                    "align": "center",
+                    "justify": "left",
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "justify": "auto",
+                  "number": "value",
+                  "numberFormat": "0,0.##",
+                  "progressBar": {
+                    "bar": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "max": 100,
+                    "min": 0,
+                    "track": {
+                      "color": "",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "value": {
+                      "enabled": true,
+                      "format": "0,0.##",
+                      "justify": "center",
+                      "style": {
+                        "classes": ""
+                      }
+                    }
+                  },
+                  "render": "view",
+                  "resizable": false,
+                  "sort": "none",
+                  "sortable": false,
+                  "strictWidth": false,
+                  "style": {
+                    "classes": ""
+                  },
+                  "toggleSwitch": {
+                    "color": {
+                      "selected": "",
+                      "unselected": ""
+                    }
+                  },
+                  "viewParams": {},
+                  "viewPath": "Exchange/Alarm Configurator/Framework/Table Cell",
+                  "visible": true,
+                  "width": ""
+                }
+              ],
+              "enableHeader": false,
+              "pager": {
+                "bottom": false
+              },
+              "rows": {
+                "height": "30px",
+                "highlight": {
+                  "color": "#DDDDDD"
+                },
+                "striped": {
+                  "enabled": false
+                }
+              },
+              "selection": {
+                "enableColumnSelection": true
+              },
+              "virtualized": false
+            },
+            "type": "ia.display.table"
+          }
+        ],
+        "meta": {
+          "name": "Content"
+        },
+        "position": {
+          "basis": "400px",
+          "grow": 1
+        },
+        "props": {
+          "direction": "column"
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "alignContent": "flex-start",
+      "direction": "column",
+      "justify": "space-evenly"
+    },
+    "type": "ia.container.flex"
+  }
+}

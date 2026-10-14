@@ -1,0 +1,278 @@
+{
+  "custom": {},
+  "params": {},
+  "propConfig": {
+    "params.feature": {
+      "paramDirection": "input"
+    },
+    "params.key": {
+      "paramDirection": "input"
+    },
+    "params.tier1": {
+      "paramDirection": "input"
+    },
+    "params.tier2": {
+      "paramDirection": "input"
+    }
+  },
+  "props": {},
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Title"
+        },
+        "position": {
+          "basis": "56px",
+          "shrink": 0
+        },
+        "props": {
+          "params": {
+            "icon": "home",
+            "text": "Home"
+          },
+          "path": "Page/Embedded/Title"
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "meta": {
+          "hasDelegate": true,
+          "name": "Welcome"
+        },
+        "position": {
+          "basis": "20px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "Page/Bold Page/Margins Page/Text"
+          },
+          "text": "Bienvenue chez Tournaire"
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "hasDelegate": true,
+          "name": "Description"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "Page/Text Page/Margins"
+          },
+          "text": "The skeleton project is intended to help you get started with Perspective. The project is designed to be mobile-responsive and fully utilizes styles. Feel free to modify as desired."
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Gauge"
+            },
+            "position": {
+              "height": 175,
+              "width": 300,
+              "x": 34,
+              "y": 26
+            },
+            "propConfig": {
+              "props.value": {
+                "binding": {
+                  "config": {
+                    "fallbackDelay": 2.5,
+                    "mode": "direct",
+                    "publishInitial": false,
+                    "tagPath": "[default]Entreprise/Site/Zone/Line/Motor 1/Amps"
+                  },
+                  "type": "tag"
+                }
+              }
+            },
+            "props": {
+              "backgroundColor": "",
+              "innerAxis": {
+                "data": "secondaryValue",
+                "maxValue": 80,
+                "percentRadius": 85,
+                "show": false,
+                "width": 1
+              },
+              "outerAxis": {
+                "data": "value",
+                "maxValue": 120,
+                "percentRadius": 100,
+                "ranges": [
+                  {
+                    "color": "#77B6D8",
+                    "end": 80,
+                    "start": 0,
+                    "width": 8
+                  },
+                  {
+                    "color": "#6E94D7",
+                    "end": 105,
+                    "start": 80,
+                    "width": 12
+                  },
+                  {
+                    "color": "#7A6BD5",
+                    "end": 120,
+                    "start": 105,
+                    "width": 16
+                  }
+                ],
+                "show": true,
+                "width": 1
+              }
+            },
+            "type": "ia.chart.gauge"
+          },
+          {
+            "meta": {
+              "name": "Gauge_0"
+            },
+            "position": {
+              "height": 175,
+              "width": 300,
+              "x": 387,
+              "y": 53
+            },
+            "propConfig": {
+              "props.value": {
+                "binding": {
+                  "config": {
+                    "fallbackDelay": 2.5,
+                    "mode": "direct",
+                    "publishInitial": false,
+                    "tagPath": "[default]Entreprise/Site/Zone/Line/Motor 1/Amps"
+                  },
+                  "type": "tag"
+                }
+              }
+            },
+            "props": {
+              "backgroundColor": "",
+              "innerAxis": {
+                "data": "secondaryValue",
+                "maxValue": 80,
+                "percentRadius": 85,
+                "show": false,
+                "width": 1
+              },
+              "outerAxis": {
+                "data": "value",
+                "maxValue": 120,
+                "percentRadius": 100,
+                "ranges": [
+                  {
+                    "color": "#77B6D8",
+                    "end": 80,
+                    "start": 0,
+                    "width": 8
+                  },
+                  {
+                    "color": "#6E94D7",
+                    "end": 105,
+                    "start": 80,
+                    "width": 12
+                  },
+                  {
+                    "color": "#7A6BD5",
+                    "end": 120,
+                    "start": 105,
+                    "width": 16
+                  }
+                ],
+                "show": true,
+                "width": 1
+              }
+            },
+            "type": "ia.chart.gauge"
+          },
+          {
+            "meta": {
+              "name": "Drawing"
+            },
+            "position": {
+              "height": 416,
+              "width": 569,
+              "x": 56,
+              "y": 214
+            },
+            "propConfig": {
+              "props.elements[1].fill.paint": {
+                "binding": {
+                  "config": {
+                    "fallbackDelay": 2.5,
+                    "mode": "direct",
+                    "publishInitial": false,
+                    "tagPath": "[default]colorfill"
+                  },
+                  "type": "tag"
+                }
+              }
+            },
+            "props": {
+              "elements": [
+                {
+                  "fill": {
+                    "paint": "#70757A"
+                  },
+                  "height": "114",
+                  "name": "rect",
+                  "stroke": {
+                    "paint": "#000000"
+                  },
+                  "type": "rect",
+                  "width": "139",
+                  "x": 80,
+                  "y": "56"
+                },
+                {
+                  "fill": {},
+                  "name": "perspective-polygon",
+                  "specialPath": {
+                    "angle": 225,
+                    "corners": 5,
+                    "height": 408.7688833558641,
+                    "rounding": 0,
+                    "width": 408.7688833558641,
+                    "x": 97.61555832206795,
+                    "y": 76.61555832206795
+                  },
+                  "stroke": {
+                    "paint": "#000000"
+                  },
+                  "type": "perspective-star"
+                }
+              ]
+            },
+            "type": "ia.shapes.svg"
+          }
+        ],
+        "meta": {
+          "name": "CoordinateContainer"
+        },
+        "position": {
+          "grow": 1
+        },
+        "type": "ia.container.coord"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "Page/Page"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

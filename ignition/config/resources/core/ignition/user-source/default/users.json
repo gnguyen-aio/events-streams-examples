@@ -8,13 +8,19 @@
       "passwordDate": "20260206.132038223-0700",
       "passwordHistory": [],
       "createdDate": "20260206.132038222-0700",
-      "lastModifiedDate": "20260206.132038222-0700",
+      "lastModifiedDate": "20260715.143749351-0600",
       "roles": [
         "1999fb81-71c7-4c28-88ec-f47a59f34f2a"
       ],
       "extraProps": [],
       "scheduleAdjustments": [],
-      "contactInfos": []
+      "contactInfos": [
+        {
+          "contactType": "email",
+          "value": "g.nguyen@axone-io.com",
+          "order": 0
+        }
+      ]
     }
   ],
   "roles": [

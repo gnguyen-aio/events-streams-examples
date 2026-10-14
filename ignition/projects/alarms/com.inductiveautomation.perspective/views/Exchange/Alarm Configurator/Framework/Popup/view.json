@@ -1,0 +1,317 @@
+{
+  "custom": {},
+  "params": {
+    "body": "value",
+    "event": {},
+    "id": "value",
+    "title": "value",
+    "yesOrNo": false
+  },
+  "propConfig": {
+    "params.body": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.event": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.id": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.title": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.yesOrNo": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 181,
+      "width": 358
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Success Or Fail Icon"
+            },
+            "position": {
+              "basis": "20px"
+            },
+            "propConfig": {
+              "props.path": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.body"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# use \u0027body\u0027 param to determine which icon to display\n\t\n\tif \"successful\" in value:\n\t\treturn \u0027material/done\u0027\n\telse:\n\t\treturn \u0027material/error\u0027",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "color": "--neutral-10",
+              "style": {
+                "marginLeft": "6px"
+              }
+            },
+            "type": "ia.display.icon"
+          },
+          {
+            "meta": {
+              "name": "Title"
+            },
+            "position": {
+              "basis": "10px",
+              "display": false,
+              "grow": 1
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.title"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "color": "--neutral-10",
+                "fontSize": 20,
+                "fontWeight": "bold",
+                "marginLeft": "2px"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t# close the popup using the \u0027id\u0027 that was passed in as a param\n\t\n\tsystem.perspective.closePopup(self.view.params.id)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Close"
+            },
+            "position": {
+              "basis": "20px"
+            },
+            "props": {
+              "color": "--neutral-10",
+              "path": "material/close",
+              "style": {
+                "classes": "exchange/alarm-configurator/icon",
+                "marginBottom": "15px"
+              }
+            },
+            "type": "ia.display.icon"
+          }
+        ],
+        "meta": {
+          "name": "Title"
+        },
+        "position": {
+          "basis": "35px",
+          "shrink": 0
+        },
+        "props": {
+          "justify": "space-between",
+          "style": {
+            "classes": "exchange/alarm-configurator/color"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Body"
+        },
+        "position": {
+          "basis": "110px",
+          "grow": 1
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "view.params.body"
+              },
+              "transforms": [
+                {
+                  "code": "\t# return the \u0027body\u0027 param value (display main message for the user)\n\t\n\treturn value",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "backgroundColor": "--neutral-10",
+            "borderStyle": "none",
+            "color": "--neutral-100",
+            "cursor": "default",
+            "fontFamily": "Helvetica",
+            "fontSize": "15px",
+            "fontWeight": "bold",
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "events": {
+          "component": {
+            "onActionPerformed": {
+              "config": {
+                "script": "\t# close the popup using the \u0027id\u0027 param\n\t\n\tsystem.perspective.closePopup(self.view.params.id)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Okay"
+        },
+        "position": {
+          "basis": "44px"
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "expression": "!{view.params.yesOrNo}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "exchange/alarm-configurator/color",
+            "marginBottom": "10px",
+            "marginLeft": "25px",
+            "marginRight": "25px"
+          },
+          "text": "Okay"
+        },
+        "type": "ia.input.button"
+      },
+      {
+        "children": [
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\t# close the popup using the \u0027id\u0027 param\n\t\n\tsystem.perspective.closePopup(self.view.params.id)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "No"
+            },
+            "position": {
+              "basis": "44px",
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "backgroundColor": "--neutral-100",
+                "classes": "exchange/alarm-configurator/color",
+                "marginRight": "10px"
+              },
+              "text": "No"
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\t# Tell the tree that it can proceed in updating its items and the selected tag.\n\t\n\tsystem.perspective.sendMessage(\u0027updateTree\u0027,payload\u003d{\u0027event\u0027:self.view.params.event},scope\u003d\u0027page\u0027)\n\tsystem.perspective.closePopup(self.view.params.id)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Yes"
+            },
+            "position": {
+              "basis": "44px",
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "classes": "exchange/alarm-configurator/color",
+                "marginLeft": "10px"
+              },
+              "text": "Yes"
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "meta": {
+          "name": "Yes Or No"
+        },
+        "position": {
+          "basis": "44px"
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "expression": "{view.params.yesOrNo}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "marginBottom": "10px",
+            "marginLeft": "25px",
+            "marginRight": "25px"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}

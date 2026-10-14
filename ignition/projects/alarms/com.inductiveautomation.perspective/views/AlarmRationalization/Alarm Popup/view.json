@@ -1,0 +1,2980 @@
+{
+  "custom": {
+    "alarmId": null,
+    "alarmObj": null,
+    "isAcked": null,
+    "refresh": 0
+  },
+  "params": {
+    "alarmName": "",
+    "tagPath": ""
+  },
+  "propConfig": {
+    "custom.alarmId": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "alarmName": "{view.params.alarmName}",
+            "tagPath": "{view.params.tagPath}"
+          },
+          "tagPath": "{tagPath}/Alarms/{alarmName}.EventId"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "custom.alarmObj": {
+      "binding": {
+        "config": {
+          "struct": {
+            "alarmName": "{view.params.alarmName}",
+            "refresh": "{view.custom.refresh}",
+            "tagPath": "{view.params.tagPath}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\treturn AlarmRationalization.Alarms.getAlarmObject(value[\"tagPath\"], value[\"alarmName\"])",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.isAcked": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "alarmName": "{view.params.alarmName}",
+            "tagPath": "{view.params.tagPath}"
+          },
+          "tagPath": "{tagPath}/Alarms/{alarmName}.IsAcked"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "custom.refresh": {
+      "persistent": true
+    },
+    "params.alarmName": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.tagPath": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 947,
+      "width": 512
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label_7"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "expression": "{view.params.tagPath} + \" : \" + {view.params.alarmName}"
+                  },
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "AlarmRationalization/Title",
+                "marginBottom": "20px"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Icon"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "path": "material/access_alarm"
+                        },
+                        "type": "ia.display.icon"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_9"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property",
+                            "marginLeft": "5px"
+                          },
+                          "text": "Alarm State"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "borderBottomColor": "var(--neutral-40)",
+                        "borderBottomStyle": "solid",
+                        "borderBottomWidth": "1px",
+                        "borderLeftStyle": "none",
+                        "borderRightStyle": "none",
+                        "borderTopStyle": "none",
+                        "marginBottom": "10px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "alarmName": "{view.params.alarmName}",
+                                  "prop": "{parent.custom.prop}",
+                                  "tagPath": "{view.params.tagPath}"
+                                },
+                                "tagPath": "{tagPath}/Alarms/{alarmName}.{prop}"
+                              },
+                              "type": "tag"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Event State",
+                      "prop": "State"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_4"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "alarmName": "{view.params.alarmName}",
+                                  "prop": "{parent.custom.prop}",
+                                  "tagPath": "{view.params.tagPath}"
+                                },
+                                "tagPath": "{tagPath}/Alarms/{alarmName}.{prop}"
+                              },
+                              "transforms": [
+                                {
+                                  "formatType": "datetime",
+                                  "formatValue": {
+                                    "date": "medium",
+                                    "time": "medium"
+                                  },
+                                  "type": "format"
+                                }
+                              ],
+                              "type": "tag"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Event Time",
+                      "prop": "EventTime"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_5"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "alarmName": "{view.params.alarmName}",
+                                  "prop": "{parent.custom.prop}",
+                                  "tagPath": "{view.params.tagPath}"
+                                },
+                                "tagPath": "{tagPath}/Alarms/{alarmName}.{prop}"
+                              },
+                              "type": "tag"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Event Value",
+                      "prop": "EventValue"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_6"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "alarmName": "{view.params.alarmName}",
+                                  "prop": "{parent.custom.prop}",
+                                  "tagPath": "{view.params.tagPath}"
+                                },
+                                "tagPath": "{tagPath}/Alarms/{alarmName}.{prop}"
+                              },
+                              "type": "tag"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Priority",
+                      "prop": "Priority"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_7"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "alarmName": "{view.params.alarmName}",
+                                  "prop": "{parent.custom.prop}",
+                                  "tagPath": "{view.params.tagPath}"
+                                },
+                                "tagPath": "{tagPath}/Alarms/{alarmName}.{prop}"
+                              },
+                              "type": "tag"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Enabled",
+                      "prop": "Enabled"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_8"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer"
+                },
+                "position": {
+                  "basis": "370px",
+                  "shrink": 0
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "marginBottom": "20px"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_1"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "wrap": "wrap"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Icon"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "path": "material/access_alarm"
+                        },
+                        "type": "ia.display.icon"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_9"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property",
+                            "marginLeft": "5px"
+                          },
+                          "text": "Alarm Configuration"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "borderBottomColor": "var(--neutral-40)",
+                        "borderBottomStyle": "solid",
+                        "borderBottomWidth": "1px",
+                        "borderLeftStyle": "none",
+                        "borderRightStyle": "none",
+                        "borderTopStyle": "none",
+                        "marginBottom": "10px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.value"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Icon",
+                          "tooltip": {
+                            "enabled": true
+                          }
+                        },
+                        "position": {
+                          "basis": "24px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "meta.tooltip.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.prop.config.bindType} + \": \" + {parent.custom.prop.config.value}"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "position.display": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.config"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\ttry:\n\t\tvalue.bindType\n\t\treturn True\n\texcept:\n\t\tpass\n\t\n\treturn False",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "path": "material/insert_link",
+                          "style": {
+                            "marginLeft": "10px"
+                          }
+                        },
+                        "type": "ia.display.icon"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Display Path"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_13"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.displayPath"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "custom": {
+                      "name": "OPC Server"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_2"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.opcServer"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "position.display": {
+                        "binding": {
+                          "config": {
+                            "expression": "{view.custom.alarmObj.alarmDetails.valueSource} \u003d \"opc\""
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "custom": {
+                      "name": "OPC Item Path"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_3"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.opcItemPath"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "position.display": {
+                        "binding": {
+                          "config": {
+                            "expression": "{view.custom.alarmObj.alarmDetails.valueSource} \u003d \"opc\""
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.value"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Icon",
+                          "tooltip": {
+                            "enabled": true
+                          }
+                        },
+                        "position": {
+                          "basis": "24px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "meta.tooltip.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.prop.config.bindType} + \": \" + {parent.custom.prop.config.value}"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "position.display": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.config"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\ttry:\n\t\tvalue.bindType\n\t\treturn True\n\texcept:\n\t\tpass\n\t\n\treturn False",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "path": "material/insert_link",
+                          "style": {
+                            "marginLeft": "10px"
+                          }
+                        },
+                        "type": "ia.display.icon"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Enabled"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_4"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.enabled"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.value"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Icon",
+                          "tooltip": {
+                            "enabled": true
+                          }
+                        },
+                        "position": {
+                          "basis": "24px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "meta.tooltip.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.prop.config.bindType} + \": \" + {parent.custom.prop.config.value}"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "position.display": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.config"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\ttry:\n\t\tvalue.bindType\n\t\treturn True\n\texcept:\n\t\tpass\n\t\n\treturn False",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "path": "material/insert_link",
+                          "style": {
+                            "marginLeft": "10px"
+                          }
+                        },
+                        "type": "ia.display.icon"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Priority"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_0"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.priority"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.value"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Icon",
+                          "tooltip": {
+                            "enabled": true
+                          }
+                        },
+                        "position": {
+                          "basis": "24px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "meta.tooltip.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.prop.config.bindType} + \": \" + {parent.custom.prop.config.value}"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "position.display": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.config"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\ttry:\n\t\tvalue.bindType\n\t\treturn True\n\texcept:\n\t\tpass\n\t\n\treturn False",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "path": "material/insert_link",
+                          "style": {
+                            "marginLeft": "10px"
+                          }
+                        },
+                        "type": "ia.display.icon"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Mode"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_1"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.mode"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.value"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Icon",
+                          "tooltip": {
+                            "enabled": true
+                          }
+                        },
+                        "position": {
+                          "basis": "24px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "meta.tooltip.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.prop.config.bindType} + \": \" + {parent.custom.prop.config.value}"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "position.display": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.config"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\ttry:\n\t\tvalue.bindType\n\t\treturn True\n\texcept:\n\t\tpass\n\t\n\treturn False",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "path": "material/insert_link",
+                          "style": {
+                            "marginLeft": "10px"
+                          }
+                        },
+                        "type": "ia.display.icon"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Setpoint A"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_5"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.setpointA"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "position.display": {
+                        "binding": {
+                          "config": {
+                            "expression": "{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"AboveValue\" ||\r\n{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"BelowValue\" ||\r\n{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"BetweenValues\" ||\r\n{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"OutsideValues\""
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.value"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Icon",
+                          "tooltip": {
+                            "enabled": true
+                          }
+                        },
+                        "position": {
+                          "basis": "24px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "meta.tooltip.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.prop.config.bindType} + \": \" + {parent.custom.prop.config.value}"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "position.display": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.config"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\ttry:\n\t\tvalue.bindType\n\t\treturn True\n\texcept:\n\t\tpass\n\t\n\treturn False",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "path": "material/insert_link",
+                          "style": {
+                            "marginLeft": "10px"
+                          }
+                        },
+                        "type": "ia.display.icon"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Inclusive A"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_7"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.inclusiveA"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "position.display": {
+                        "binding": {
+                          "config": {
+                            "expression": "{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"AboveValue\" || \r\n{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"BelowValue\" || \r\n{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"BetweenValues\" || \r\n{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"OutsideValues\""
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.value"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Icon",
+                          "tooltip": {
+                            "enabled": true
+                          }
+                        },
+                        "position": {
+                          "basis": "24px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "meta.tooltip.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.prop.config.bindType} + \": \" + {parent.custom.prop.config.value}"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "position.display": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.config"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\ttry:\n\t\tvalue.bindType\n\t\treturn True\n\texcept:\n\t\tpass\n\t\n\treturn False",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "path": "material/insert_link",
+                          "style": {
+                            "marginLeft": "10px"
+                          }
+                        },
+                        "type": "ia.display.icon"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Setpoint B"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_6"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.setpointB"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "position.display": {
+                        "binding": {
+                          "config": {
+                            "expression": "{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"BetweenValues\" || \r\n{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"OutsideValues\""
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.value"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Icon",
+                          "tooltip": {
+                            "enabled": true
+                          }
+                        },
+                        "position": {
+                          "basis": "24px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "meta.tooltip.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.prop.config.bindType} + \": \" + {parent.custom.prop.config.value}"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "position.display": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.config"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\ttry:\n\t\tvalue.bindType\n\t\treturn True\n\texcept:\n\t\tpass\n\t\n\treturn False",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "path": "material/insert_link",
+                          "style": {
+                            "marginLeft": "10px"
+                          }
+                        },
+                        "type": "ia.display.icon"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Inclusive B"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_8"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.inclusiveB"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "position.display": {
+                        "binding": {
+                          "config": {
+                            "expression": "{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"BetweenValues\" || \r\n{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"OutsideValues\""
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.value"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Icon",
+                          "tooltip": {
+                            "enabled": true
+                          }
+                        },
+                        "position": {
+                          "basis": "24px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "meta.tooltip.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.prop.config.bindType} + \": \" + {parent.custom.prop.config.value}"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "position.display": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.config"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\ttry:\n\t\tvalue.bindType\n\t\treturn True\n\texcept:\n\t\tpass\n\t\n\treturn False",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "path": "material/insert_link",
+                          "style": {
+                            "marginLeft": "10px"
+                          }
+                        },
+                        "type": "ia.display.icon"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Any Change"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_9"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.anyChange"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "position.display": {
+                        "binding": {
+                          "config": {
+                            "expression": "{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"AboveValue\" ||\r\n{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"BelowValue\" ||\r\n{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"BetweenValues\" ||\r\n{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"OutsideValues\""
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.value"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Icon",
+                          "tooltip": {
+                            "enabled": true
+                          }
+                        },
+                        "position": {
+                          "basis": "24px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "meta.tooltip.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.prop.config.bindType} + \": \" + {parent.custom.prop.config.value}"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "position.display": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.config"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\ttry:\n\t\tvalue.bindType\n\t\treturn True\n\texcept:\n\t\tpass\n\t\n\treturn False",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "path": "material/insert_link",
+                          "style": {
+                            "marginLeft": "10px"
+                          }
+                        },
+                        "type": "ia.display.icon"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Active Condition"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_10"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.activeCondition"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "position.display": {
+                        "binding": {
+                          "config": {
+                            "expression": "{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"OnCondition\""
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.value"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Icon",
+                          "tooltip": {
+                            "enabled": true
+                          }
+                        },
+                        "position": {
+                          "basis": "24px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "meta.tooltip.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.prop.config.bindType} + \": \" + {parent.custom.prop.config.value}"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "position.display": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.config"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\ttry:\n\t\tvalue.bindType\n\t\treturn True\n\texcept:\n\t\tpass\n\t\n\treturn False",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "path": "material/insert_link",
+                          "style": {
+                            "marginLeft": "10px"
+                          }
+                        },
+                        "type": "ia.display.icon"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Bit Position"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_11"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.bitPosition"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "position.display": {
+                        "binding": {
+                          "config": {
+                            "expression": "{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"Bit\""
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_6"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.name} + \":\""
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_7"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.value"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Value",
+                            "marginLeft": "5px"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Icon",
+                          "tooltip": {
+                            "enabled": true
+                          }
+                        },
+                        "position": {
+                          "basis": "24px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "meta.tooltip.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{parent.custom.prop.config.bindType} + \": \" + {parent.custom.prop.config.value}"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "position.display": {
+                            "binding": {
+                              "config": {
+                                "path": "parent.custom.prop.config"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\ttry:\n\t\tvalue.bindType\n\t\treturn True\n\texcept:\n\t\tpass\n\t\n\treturn False",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "path": "material/insert_link",
+                          "style": {
+                            "marginLeft": "10px"
+                          }
+                        },
+                        "type": "ia.display.icon"
+                      }
+                    ],
+                    "custom": {
+                      "name": "Bit On Zero"
+                    },
+                    "meta": {
+                      "name": "FlexContainer_12"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.prop": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.bitOnZero"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "position.display": {
+                        "binding": {
+                          "config": {
+                            "expression": "{view.custom.alarmObj.alarmDetails.mode.value} \u003d \"Bit\""
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": "0px"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer"
+                },
+                "position": {
+                  "basis": "370px",
+                  "shrink": 0
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "marginBottom": "20px"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_2"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "wrap": "wrap"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label_8"
+                },
+                "position": {
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.style.backgroundColor": {
+                    "binding": {
+                      "config": {
+                        "expression": "if({view.custom.alarmObj.alarmDetails.rationalization.rationalized}, \"#00AC00\", \"#FF0000\")"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "if({view.custom.alarmObj.alarmDetails.rationalization.rationalized}, \"Alarm Rationalized\", \"Alarm Not Rationalized\")"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "borderBottomLeftRadius": "4px",
+                    "borderBottomRightRadius": "4px",
+                    "borderTopLeftRadius": "4px",
+                    "borderTopRightRadius": "4px",
+                    "classes": "AlarmRationalization/Property",
+                    "color": "#FFFFFF",
+                    "fontSize": "14px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_3"
+            },
+            "position": {
+              "basis": "28px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "marginBottom": "20px"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Icon"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "path": "material/category"
+                        },
+                        "type": "ia.display.icon"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_9"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property",
+                            "marginLeft": "5px"
+                          },
+                          "text": "Alarm Category"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "borderBottomColor": "var(--neutral-40)",
+                        "borderBottomStyle": "solid",
+                        "borderBottomWidth": "1px",
+                        "borderLeftStyle": "none",
+                        "borderRightStyle": "none",
+                        "borderTopStyle": "none",
+                        "marginBottom": "10px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_8"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "AlarmRationalization/Property"
+                      },
+                      "text": "Description"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Description"
+                    },
+                    "position": {
+                      "basis": "75px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.rationalization.rDescription"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "enabled": false,
+                      "style": {
+                        "backgroundColor": "#FFFFFF",
+                        "classes": "AlarmRationalization/Field",
+                        "marginBottom": "10px"
+                      }
+                    },
+                    "type": "ia.input.text-area"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_9"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "AlarmRationalization/Property"
+                      },
+                      "text": "Alarm Class"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Class"
+                    },
+                    "position": {
+                      "basis": "36px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.options": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "direct",
+                            "tagPath": "AlarmRationalization/Configuration"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tret \u003d []\n\tfor name in value[\"AlarmClasses\"]:\n\t\tret.append({\"label\":name, \"value\":name})\n\treturn ret",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "tag"
+                        }
+                      },
+                      "props.value": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.rationalization.rClass"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tif value \u003d\u003d None or value \u003d\u003d \"\":\n\t\treturn None\n\treturn value.split(\",\")",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "enabled": false,
+                      "multiSelect": true,
+                      "style": {
+                        "backgroundColor": "#FFFFFF",
+                        "classes": "AlarmRationalization/Field",
+                        "marginBottom": "10px"
+                      }
+                    },
+                    "type": "ia.input.dropdown"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer"
+                },
+                "position": {
+                  "shrink": 0
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "marginRight": "10px",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Icon"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "path": "material/sticky_note_2"
+                        },
+                        "type": "ia.display.icon"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_9"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "AlarmRationalization/Property",
+                            "marginLeft": "5px"
+                          },
+                          "text": "Alarm Details"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "borderBottomColor": "var(--neutral-40)",
+                        "borderBottomStyle": "solid",
+                        "borderBottomWidth": "1px",
+                        "borderLeftStyle": "none",
+                        "borderRightStyle": "none",
+                        "borderTopStyle": "none",
+                        "marginBottom": "10px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_11"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "AlarmRationalization/Property"
+                      },
+                      "text": "Probable Cause"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Probable Cause"
+                    },
+                    "position": {
+                      "basis": "75px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.rationalization.rProbableCause"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "enabled": false,
+                      "style": {
+                        "backgroundColor": "#FFFFFF",
+                        "classes": "AlarmRationalization/Field",
+                        "marginBottom": "10px"
+                      }
+                    },
+                    "type": "ia.input.text-area"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_12"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "AlarmRationalization/Property"
+                      },
+                      "text": "Confirmation"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Confirmation"
+                    },
+                    "position": {
+                      "basis": "75px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.rationalization.rConfirmation"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "enabled": false,
+                      "style": {
+                        "backgroundColor": "#FFFFFF",
+                        "classes": "AlarmRationalization/Field",
+                        "marginBottom": "10px"
+                      }
+                    },
+                    "type": "ia.input.text-area"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_13"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "AlarmRationalization/Property"
+                      },
+                      "text": "Corrective Actions"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Corrective Actions"
+                    },
+                    "position": {
+                      "basis": "75px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.rationalization.rCorrectiveActions"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "enabled": false,
+                      "style": {
+                        "backgroundColor": "#FFFFFF",
+                        "classes": "AlarmRationalization/Field",
+                        "marginBottom": "10px"
+                      }
+                    },
+                    "type": "ia.input.text-area"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_14"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "AlarmRationalization/Property"
+                      },
+                      "text": "Consequence of No Action"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Consequence No Action"
+                    },
+                    "position": {
+                      "basis": "75px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.alarmObj.alarmDetails.rationalization.rConsequenceNoAction"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "enabled": false,
+                      "style": {
+                        "backgroundColor": "#FFFFFF",
+                        "classes": "AlarmRationalization/Field",
+                        "marginBottom": "10px"
+                      }
+                    },
+                    "type": "ia.input.text-area"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_0"
+                },
+                "position": {
+                  "shrink": 0
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "marginRight": "10px",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "direction": "column"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\talarmIds \u003d [self.view.custom.alarmId]\n\tsystem.alarm.acknowledge(alarmIds, \"Acknowledged from the alarm rationalization popup\", self.session.props.auth.user.userName)\n\tself.view.custom.refresh +\u003d 1"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Button"
+                },
+                "position": {
+                  "basis": "145px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "!{view.custom.isAcked}"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "image": {
+                    "icon": {
+                      "path": "material/check"
+                    }
+                  },
+                  "style": {
+                    "marginRight": "5px"
+                  },
+                  "text": "Acknowledge"
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "draggable": true,
+                        "id": "alarmPopup",
+                        "modal": false,
+                        "overlayDismiss": false,
+                        "resizable": true,
+                        "showCloseIcon": true,
+                        "type": "close",
+                        "viewPath": "",
+                        "viewportBound": false
+                      },
+                      "scope": "C",
+                      "type": "popup"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Button_0"
+                },
+                "position": {
+                  "basis": "90px",
+                  "shrink": 0
+                },
+                "props": {
+                  "image": {
+                    "icon": {
+                      "path": "material/exit_to_app"
+                    }
+                  },
+                  "text": "Close"
+                },
+                "type": "ia.input.button"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "marginBottom": "10px",
+            "marginLeft": "10px",
+            "marginTop": "10px"
+          },
+          "wrap": "wrap"
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "base": {
+    "style": {
+      "color": "var(--neutral-10)",
+      "fontFamily": "Helvetica",
+      "fontStyle": "italic",
+      "fontWeight": "bold"
+    }
+  }
+}

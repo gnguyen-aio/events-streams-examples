@@ -1,0 +1,200 @@
+{
+  "custom": {
+    "configuration": {
+      "AlarmClasses": [
+        "Class 1",
+        "Class 2"
+      ],
+      "EnvironmentalImpact": {
+        "0": "None",
+        "1": "Inconsequential",
+        "2": "Potential short term",
+        "3": "Significant"
+      },
+      "Facilities": [
+        "Facility A"
+      ],
+      "FinancialImpact": {
+        "0": "None",
+        "1": "$100M per event",
+        "2": "$100M-$1MM per event",
+        "3": "1MM or more per event"
+      },
+      "OperatorUrgency": {
+        "0": {
+          "name": "\u003e 45 Minutes",
+          "states": {
+            "0": "Diagnostic",
+            "1": "Low",
+            "2": "Low",
+            "3": "Medium"
+          }
+        },
+        "1": {
+          "name": "15-45 Minutes",
+          "states": {
+            "0": "Diagnostic",
+            "1": "Low",
+            "2": "Medium",
+            "3": "High"
+          }
+        },
+        "2": {
+          "name": "3-15 Minutes",
+          "states": {
+            "0": "Diagnostic",
+            "1": "Medium",
+            "2": "High",
+            "3": "Critical"
+          }
+        }
+      },
+      "PriorityColors": {
+        "Critical": "#FF8AFF",
+        "Diagnostic": "#D5D5D5",
+        "High": "#FF8A8A",
+        "Low": "#FFFF8A",
+        "Medium": "#FFCA8A"
+      },
+      "ProcessAreas": [
+        "Area A"
+      ],
+      "SafetyImpact": {
+        "0": "None",
+        "1": "Minor",
+        "2": "Medical Treatment",
+        "3": "Serious"
+      }
+    }
+  },
+  "params": {
+    "impact": 2,
+    "selected": false,
+    "urgency": 0
+  },
+  "propConfig": {
+    "custom.configuration": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "direct",
+          "tagPath": "AlarmRationalization/Configuration"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "params.impact": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.selected": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.urgency": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 200,
+      "width": 115
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Label_11"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "config": "{view.custom.configuration}",
+                  "urgency": "{view.params.urgency}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\treturn value[\"config\"][\"OperatorUrgency\"][str(value[\"urgency\"])][\"name\"]",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "AlarmRationalization/Property",
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Priority"
+        },
+        "position": {
+          "grow": 1
+        },
+        "propConfig": {
+          "props.controlValue": {
+            "binding": {
+              "config": {
+                "expression": "if({view.params.selected}, {view.params.impact}, -1)"
+              },
+              "type": "expr"
+            }
+          },
+          "props.indicatorValue": {
+            "binding": {
+              "config": {
+                "path": "this.props.controlValue"
+              },
+              "type": "property"
+            }
+          },
+          "props.states": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "config": "{view.custom.configuration}",
+                  "urgency": "{view.params.urgency}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\tret \u003d []\n\tcolors \u003d value[\"config\"][\"PriorityColors\"]\n\tstates \u003d value[\"config\"][\"OperatorUrgency\"][str(value[\"urgency\"])][\"states\"]\n\tfor idx in states:\n\t\tcolor \u003d colors.get(states[idx], \"#D5D5D5\")\n\t\tret.append({\n\t\t  \"text\": states[idx],\n\t\t  \"value\": int(idx),\n\t\t  \"selectedStyle\": {\n\t\t    \"classes\": \"\",\n\t\t    \"backgroundColor\": color,\n\t\t    \"color\": \"var(--neutral-90)\",\n\t\t    \"border\": \"2px solid var(--neutral-90)\",\n\t\t    \"fontSize\": \"18px\"\n\t\t  },\n\t\t  \"unselectedStyle\": {\n\t\t    \"classes\": \"\",\n\t\t    \"backgroundColor\": color,\n\t\t    \"color\": \"var(--neutral-90)\"\n\t\t  }\n\t\t})\n\t\t\n\treturn ret",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        },
+        "props": {
+          "enabled": false
+        },
+        "type": "ia.input.multi-state-button"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}

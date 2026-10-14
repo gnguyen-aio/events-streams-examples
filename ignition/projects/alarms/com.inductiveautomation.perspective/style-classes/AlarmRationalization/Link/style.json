@@ -1,0 +1,12 @@
+{
+  "base": {
+    "style": {
+      "color": "var(--callToAction)",
+      "cursor": "pointer",
+      "fontSize": "12px",
+      "fontWeight": "bolder",
+      "textTransform": "uppercase",
+      "fill": "var(--neutral-70)"
+    }
+  }
+}
